@@ -17,13 +17,13 @@
     justify-content: center;
     padding: 20px;
   }
-  h1 { font-size: 1.6rem; margin-bottom: 6px; }
-  .sub { color: #999; margin-bottom: 24px; font-size: 0.85rem; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .sub { color: #999; margin-bottom: 20px; font-size: 0.85rem; }
   .card {
     background: #1a1a2e;
     border-radius: 16px;
     padding: 28px 24px;
-    max-width: 420px;
+    max-width: 460px;
     width: 100%;
     text-align: center;
   }
@@ -43,26 +43,6 @@
   .btn-share { background: #4f46e5; color: #fff; }
   .btn-receive { background: #059669; color: #fff; }
   .btn-stop { background: #dc2626; color: #fff; }
-  .btn-copy { background: #333; color: #eee; font-size: 0.9rem; padding: 10px; }
-  .code-box {
-    background: #0f0f1a;
-    border-radius: 10px;
-    padding: 14px;
-    margin: 16px 0;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    word-break: break-all;
-    user-select: all;
-    border: 1px solid #333;
-  }
-  textarea.code-box {
-    width: 100%;
-    min-height: 80px;
-    resize: vertical;
-    color: #eee;
-    outline: none;
-  }
-  textarea.code-box:focus { border-color: #4f46e5; }
   .status { margin: 12px 0; font-size: 0.9rem; color: #bbb; }
   .status.connected { color: #4ade80; }
   .status.error { color: #f87171; }
@@ -87,45 +67,98 @@
     margin-bottom: 4px;
   }
   hr { border: none; border-top: 1px solid #333; margin: 20px 0; }
-  .mode-select {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .mode-select .btn { flex: 1; margin: 0; opacity: 0.5; }
-  .mode-select .btn.active { opacity: 1; }
   .hidden { display: none; }
+
+  /* QR Code styling */
+  #qrContainer {
+    margin: 16px auto;
+    text-align: center;
+  }
+  #qrContainer img {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+  }
+  .qr-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 8px;
+  }
+  .code-text {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    color: #555;
+    word-break: break-all;
+    margin-top: 8px;
+    max-height: 40px;
+    overflow: hidden;
+  }
+  .connecting-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+    100% { content: ''; }
+  }
+
+  /* Scan instructions */
+  .scan-instructions {
+    background: #0f0f1a;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 12px 0;
+    text-align: left;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .scan-instructions li {
+    margin-left: 18px;
+    color: #ccc;
+  }
+  .scan-instructions strong {
+    color: #4ade80;
+  }
 </style>
 </head>
 <body>
 
 <div class="card" id="modeScreen">
   <h1>📱 Screen Mirror</h1>
-  <p class="sub">Peer-to-peer over your local network</p>
+  <p class="sub">Phone → TV via QR code</p>
 
-  <div class="mode-select">
-    <button class="btn btn-share active" id="modeShareBtn">📤 Share</button>
-    <button class="btn btn-receive" id="modeReceiveBtn">📥 Receive</button>
+  <!-- RECEIVER MODE (TV) -->
+  <div id="receivePanel">
+    <p class="step-label" style="color:#059669;font-weight:600;">⬇ TV — Receiving</p>
+
+    <div id="qrContainer">
+      <div class="status">Generating QR code...</div>
+    </div>
+
+    <div class="scan-instructions">
+      <strong>📸 Scan with your iPhone:</strong>
+      <ol style="margin-top:6px;padding-left:18px;">
+        <li>Open <strong>Camera</strong> on your iPhone</li>
+        <li>Point at this QR code</li>
+        <li>Tap the notification banner that appears</li>
+        <li>Your screen will start sharing</li>
+      </ol>
+    </div>
+
+    <div class="status" id="receiveStatus">Waiting for connection...</div>
+    <button class="btn btn-stop hidden" id="stopReceiveBtn">⏹ Stop &amp; Reset</button>
   </div>
 
-  <!-- SHARE MODE -->
-  <div id="sharePanel">
-    <p class="step-label">Step 1 — Get the receiver's code</p>
-    <p style="font-size:0.85rem;color:#999;margin-bottom:12px;">
-      On your TV, tap <strong>Receive</strong> and enter the code shown there.
-    </p>
-    <textarea class="code-box" id="remoteCode" placeholder="Paste the receiver's connection code here..."></textarea>
-    <button class="btn btn-share" id="startShareBtn">📤 Share Screen</button>
-    <div class="status" id="shareStatus">Enter the receiver's code and tap Share Screen</div>
-  </div>
-
-  <!-- RECEIVE MODE -->
-  <div id="receivePanel" class="hidden">
-    <p class="step-label">Your connection code</p>
-    <div class="code-box" id="myCode">Generating...</div>
-    <button class="btn btn-copy" id="copyCodeBtn">📋 Copy Code</button>
-    <div class="status" id="receiveStatus">Waiting for someone to connect...</div>
-    <button class="btn btn-stop hidden" id="stopReceiveBtn">⏹ Stop</button>
+  <!-- SHARER MODE (iPhone) -->
+  <div id="sharePanel" class="hidden">
+    <p class="step-label" style="color:#4f46e5;font-weight:600;">📤 iPhone — Sharing</p>
+    <div class="status" id="shareStatus">Connecting...</div>
+    <button class="btn btn-stop hidden" id="stopShareBtn">⏹ Stop Sharing</button>
   </div>
 </div>
 
@@ -142,46 +175,31 @@ const iceServers = {
   ]
 };
 
+const RECEIVE_TIMEOUT_MS = 120000; // 2 min before regenerating code
+
 // ───  DOM refs ───────────────────────────────────────────────────
-const modeScreen       = document.getElementById('modeScreen');
-const modeShareBtn     = document.getElementById('modeShareBtn');
-const modeReceiveBtn   = document.getElementById('modeReceiveBtn');
-const sharePanel       = document.getElementById('sharePanel');
 const receivePanel     = document.getElementById('receivePanel');
-const remoteCode       = document.getElementById('remoteCode');
-const startShareBtn    = document.getElementById('startShareBtn');
-const shareStatus      = document.getElementById('shareStatus');
-const myCodeDiv        = document.getElementById('myCode');
-const copyCodeBtn      = document.getElementById('copyCodeBtn');
+const sharePanel       = document.getElementById('sharePanel');
+const qrContainer      = document.getElementById('qrContainer');
 const receiveStatus    = document.getElementById('receiveStatus');
 const stopReceiveBtn   = document.getElementById('stopReceiveBtn');
+const shareStatus      = document.getElementById('shareStatus');
+const stopShareBtn     = document.getElementById('stopShareBtn');
 const videoContainer   = document.getElementById('videoContainer');
 const remoteVideo      = document.getElementById('remoteVideo');
 
-let pc = null;           // RTCPeerConnection
-let localStream = null;  // screen capture stream
-let mode = 'share';      // 'share' | 'receive'
-let makingOffer = false;
+let pc = null;
+let localStream = null;
+let receiveTimer = null;
 
-// ───  Mode switching ─────────────────────────────────────────────
-modeShareBtn.addEventListener('click', () => {
-  mode = 'share';
-  modeShareBtn.classList.add('active');
-  modeReceiveBtn.classList.remove('active');
-  sharePanel.classList.remove('hidden');
-  receivePanel.classList.add('hidden');
-  resetConnection();
-});
-
-modeReceiveBtn.addEventListener('click', () => {
-  mode = 'receive';
-  modeReceiveBtn.classList.add('active');
-  modeShareBtn.classList.remove('active');
-  receivePanel.classList.remove('hidden');
-  sharePanel.classList.add('hidden');
-  resetConnection();
-  startReceiver();
-});
+// ───  Detect mode from URL hash ──────────────────────────────────
+function detectMode() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#connect=')) {
+    return { mode: 'share', data: hash.slice(9) };
+  }
+  return { mode: 'receive' };
+}
 
 // ───  Reset ──────────────────────────────────────────────────────
 function resetConnection() {
@@ -191,23 +209,16 @@ function resetConnection() {
     localStream = null;
   }
   videoContainer.style.display = 'none';
+  if (receiveTimer) { clearTimeout(receiveTimer); receiveTimer = null; }
   shareStatus.textContent = '';
   shareStatus.className = 'status';
   receiveStatus.textContent = '';
   receiveStatus.className = 'status';
   stopReceiveBtn.classList.add('hidden');
-  remoteCode.value = '';
+  stopShareBtn.classList.add('hidden');
 }
 
-// ───  Generate a random ID ──────────────────────────────────────
-function randomId() {
-  const a = new Uint8Array(16);
-  crypto.getRandomValues(a);
-  return btoa(String.fromCharCode(...a)).replace(/[/+=]/g, '').slice(0, 12);
-}
-
-// ───  Encode / decode SDP + ICE for manual signaling ────────────
-// Format: base64(json({type, sdp, candidates: [...]}))
+// ───  Encode / decode connection data ────────────────────────────
 function encodeConnectionData(offer, candidates) {
   const data = {
     type: offer.type,
@@ -223,158 +234,152 @@ function encodeConnectionData(offer, candidates) {
 
 function decodeConnectionData(str) {
   try {
-    return JSON.parse(atob(str));
+    return JSON.parse(atob(decodeURIComponent(str)));
   } catch {
-    return null;
+    try { return JSON.parse(atob(str)); } catch { return null; }
   }
 }
 
-// ───  RECEIVER ──────────────────────────────────────────────────
+// ───  RECEIVER (TV) ─────────────────────────────────────────────
 let receiverCandidates = [];
 
 async function startReceiver() {
   resetConnection();
-  myCodeDiv.textContent = 'Creating connection...';
+  receivePanel.classList.remove('hidden');
+  sharePanel.classList.add('hidden');
+
+  qrContainer.innerHTML = '<div class="status">Setting up connection...</div>';
+  receiveStatus.textContent = 'Initializing...';
+  stopReceiveBtn.classList.add('hidden');
 
   pc = new RTCPeerConnection(iceServers);
   receiverCandidates = [];
 
-  // Collect ICE candidates as they arrive
   pc.onicecandidate = (e) => {
-    if (e.candidate) {
-      receiverCandidates.push(e.candidate);
-    }
+    if (e.candidate) receiverCandidates.push(e.candidate);
   };
 
   pc.ontrack = (event) => {
-    console.log('Track received!');
     remoteVideo.srcObject = event.streams[0];
     videoContainer.style.display = 'block';
-    receiveStatus.textContent = '✅ Connected — receiving stream!';
+    receiveStatus.textContent = '✅ Connected — receiving screen!';
     receiveStatus.className = 'status connected';
-    stopReceiveBtn.classList.remove('hidden');
+    qrContainer.innerHTML = '<div class="status connected">✅ Connected!</div>';
+    if (receiveTimer) clearTimeout(receiveTimer);
   };
 
   pc.oniceconnectionstatechange = () => {
-    console.log('ICE state:', pc.iceConnectionState);
-    if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
-      receiveStatus.textContent = '⚠ Connection lost. Tap Receive again.';
+    if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+      receiveStatus.textContent = '✅ Connected — receiving screen!';
+      receiveStatus.className = 'status connected';
+      stopReceiveBtn.classList.remove('hidden');
+    } else if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+      receiveStatus.textContent = '⚠ Lost connection. Refresh the page.';
       receiveStatus.className = 'status error';
-      stopReceiveBtn.classList.add('hidden');
     }
   };
 
   try {
-    // Create a data channel (required to make the offer valid for screen sharing)
     pc.createDataChannel('screen-mirror');
     const offer = await pc.createOffer();
-    makingOffer = true;
     await pc.setLocalDescription(offer);
-    makingOffer = false;
 
-    // Wait a moment for ICE candidates to gather
-    await new Promise(r => setTimeout(r, 1500));
+    // Wait for ICE candidates
+    await new Promise(r => setTimeout(r, 2000));
 
-    myCodeDiv.textContent = encodeConnectionData(offer, receiverCandidates);
-    receiveStatus.textContent = '📋 Copy this code and send it to the sharer';
+    const code = encodeConnectionData(offer, receiverCandidates);
+    const pageUrl = window.location.href.split('#')[0].split('?')[0];
+    const connectUrl = pageUrl + '#connect=' + encodeURIComponent(code);
+
+    // Show QR code
+    const qrImg = document.createElement('img');
+    qrImg.alt = 'Scan to connect';
+    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(connectUrl);
+    qrImg.onerror = () => {
+      // Fallback if QR API fails — show the code as text
+      qrContainer.innerHTML = `
+        <div class="status error">Couldn't load QR code.</div>
+        <p style="color:#999;font-size:0.85rem;">Open this link on your iPhone:</p>
+        <div class="code-text" style="font-size:0.75rem;color:#4ade80;max-height:none;margin-top:6px;">
+          ${connectUrl.length > 100 ? connectUrl.slice(0, 100) + '…' : connectUrl}
+        </div>
+      `;
+    };
+
+    qrContainer.innerHTML = '';
+    qrContainer.appendChild(qrImg);
+
+    const label = document.createElement('div');
+    label.className = 'qr-label';
+    label.textContent = 'Point your iPhone camera here';
+    qrContainer.appendChild(label);
+
+    receiveStatus.textContent = '⏳ Waiting for iPhone to scan...';
+
+    // Auto-refresh the QR code after timeout
+    receiveTimer = setTimeout(() => {
+      if (pc && pc.connectionState === 'new') {
+        receiveStatus.textContent = '🔄 Code expired — generating new one...';
+        pc.close();
+        startReceiver();
+      }
+    }, RECEIVE_TIMEOUT_MS);
+
   } catch (err) {
-    receiveStatus.textContent = 'Error: ' + err.message;
+    qrContainer.innerHTML = '<div class="status error">Error: ' + err.message + '</div>';
+    receiveStatus.textContent = 'Something went wrong. Refresh the page.';
     receiveStatus.className = 'status error';
-    myCodeDiv.textContent = 'Error';
   }
 }
 
-// ───  SHARER ─────────────────────────────────────────────────────
-startShareBtn.addEventListener('click', async () => {
-  const code = remoteCode.value.trim();
-  if (!code) {
-    shareStatus.textContent = 'Paste the receiver\'s connection code first';
-    shareStatus.className = 'status error';
-    return;
-  }
-
-  const data = decodeConnectionData(code);
-  if (!data) {
-    shareStatus.textContent = 'Invalid connection code. Make sure you copied it fully.';
-    shareStatus.className = 'status error';
-    return;
-  }
+// ───  SHARER (iPhone) ────────────────────────────────────────────
+async function startSharer(connectionData) {
+  resetConnection();
+  receivePanel.classList.add('hidden');
+  sharePanel.classList.remove('hidden');
 
   shareStatus.textContent = '⏳ Requesting screen share...';
-  shareStatus.className = 'status';
 
   try {
-    // Request screen capture
     localStream = await navigator.mediaDevices.getDisplayMedia({
       video: { frameRate: { ideal: 15 } },
       audio: false
     });
 
-    // If user cancels screen picker
     if (!localStream) {
       shareStatus.textContent = 'Screen share was cancelled';
       shareStatus.className = 'status error';
       return;
     }
 
-    shareStatus.textContent = '⏳ Connecting to receiver...';
+    shareStatus.textContent = '⏳ Connecting to TV...';
 
     pc = new RTCPeerConnection(iceServers);
 
-    // Add screen track
     localStream.getTracks().forEach(track => {
       pc.addTrack(track, localStream);
     });
 
-    // Handle ICE candidates from receiver
-    if (data.candidates && data.candidates.length > 0) {
-      for (const c of data.candidates) {
+    // Add receiver's ICE candidates
+    if (connectionData.candidates && connectionData.candidates.length > 0) {
+      for (const c of connectionData.candidates) {
         if (c.candidate) {
-          try {
-            await pc.addIceCandidate(new RTCIceCandidate(c));
-          } catch (e) {
-            console.log('Ignored ICE candidate:', e.message);
-          }
+          try { await pc.addIceCandidate(new RTCIceCandidate(c)); }
+          catch (e) { /* skip */ }
         }
       }
     }
 
-    // Set remote description
-    await pc.setRemoteDescription({ type: data.type, sdp: data.sdp });
+    await pc.setRemoteDescription({ type: connectionData.type, sdp: connectionData.sdp });
 
-    // Create answer
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
 
-    // Generate answer code for the receiver
-    let answerCandidates = [];
-    pc.onicecandidate = (e) => {
-      if (e.candidate) {
-        answerCandidates.push(e.candidate);
-      }
-    };
-
-    // Wait for some candidates
-    await new Promise(r => setTimeout(r, 1500));
-
-    const answerData = encodeConnectionData(answer, answerCandidates);
-    // Update the remote code box with the answer
-    remoteCode.value = answerData;
-
-    shareStatus.textContent = '✅ Connected! Screen is being shared.';
+    shareStatus.textContent = '✅ Connected! Sharing your screen.';
     shareStatus.className = 'status connected';
+    stopShareBtn.classList.remove('hidden');
 
-    // Show stop button
-    startShareBtn.textContent = '⏹ Stop Sharing';
-    startShareBtn.classList.remove('btn-share');
-    startShareBtn.classList.add('btn-stop');
-    startShareBtn.removeEventListener('click', arguments.callee);
-    startShareBtn.addEventListener('click', stopSharing);
-
-    // When user stops screen capture via browser UI
-    localStream.getVideoTracks()[0].onended = () => {
-      stopSharing();
-    };
+    localStream.getVideoTracks()[0].onended = () => stopAll();
 
     pc.oniceconnectionstatechange = () => {
       if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
@@ -388,56 +393,51 @@ startShareBtn.addEventListener('click', async () => {
     shareStatus.className = 'status error';
     console.error(err);
   }
-});
-
-function stopSharing() {
-  if (localStream) {
-    localStream.getTracks().forEach(t => t.stop());
-    localStream = null;
-  }
-  if (pc) { pc.close(); pc = null; }
-  startShareBtn.textContent = '📤 Share Screen';
-  startShareBtn.classList.remove('btn-stop');
-  startShareBtn.classList.add('btn-share');
-  shareStatus.textContent = 'Sharing stopped';
-  shareStatus.className = 'status';
-  videoContainer.style.display = 'none';
-  remoteCode.value = '';
 }
 
-// ───  Copy code button ──────────────────────────────────────────
-copyCodeBtn.addEventListener('click', async () => {
-  const text = myCodeDiv.textContent;
-  if (!text || text === 'Generating...' || text === 'Error' || text === 'Creating connection...') return;
-  try {
-    await navigator.clipboard.writeText(text);
-    copyCodeBtn.textContent = '✅ Copied!';
-    setTimeout(() => { copyCodeBtn.textContent = '📋 Copy Code'; }, 2000);
-  } catch {
-    // Fallback: select text
-    const range = document.createRange();
-    range.selectNodeContents(myCodeDiv);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    copyCodeBtn.textContent = '📋 Select All (copy manually)';
-    setTimeout(() => { copyCodeBtn.textContent = '📋 Copy Code'; }, 2000);
-  }
-});
+function stopAll() {
+  if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+  if (pc) { pc.close(); pc = null; }
+  shareStatus.textContent = 'Stopped';
+  shareStatus.className = 'status';
+  videoContainer.style.display = 'none';
+  stopShareBtn.classList.add('hidden');
+}
 
-// ───  Stop receiving ────────────────────────────────────────────
+// ───  Button handlers ────────────────────────────────────────────
 stopReceiveBtn.addEventListener('click', () => {
-  resetConnection();
+  pc.close();
   startReceiver();
 });
 
-// ───  Start in receive mode initially ──────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  // Start in receive mode by default
-  startReceiver();
-});
+stopShareBtn.addEventListener('click', stopAll);
 
-console.log('Screen Mirror ready. Use Share on your phone, Receive on your TV.');
+// ───  Init ───────────────────────────────────────────────────────
+const config = detectMode();
+
+if (config.mode === 'share') {
+  const data = decodeConnectionData(config.data);
+  if (data) {
+    startSharer(data);
+  } else {
+    // Invalid data in hash
+    document.body.innerHTML = `
+      <div class="card" style="text-align:center;">
+        <h1>❌ Invalid Link</h1>
+        <p style="color:#999;margin:20px 0;">The QR code you scanned contains invalid data.</p>
+        <p style="color:#999;">Please refresh the page on your TV to get a new code.</p>
+        <br>
+        <button class="btn btn-receive" onclick="window.location.href=window.location.href.split('#')[0]">
+          🔄 Go to Home
+        </button>
+      </div>
+    `;
+  }
+} else {
+  startReceiver();
+}
+
+console.log('Screen Mirror ready');
 </script>
 </body>
 </html>
