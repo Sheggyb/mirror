@@ -149,6 +149,7 @@ const remoteVideo  = document.getElementById('remoteVideo');
 
 let pc = null, localStream = null;
 let mqttTV = null, mqttPhone = null;
+let retryTimer = null;
 let room = '';
 
 const isPhone = window.innerWidth < 800 && 'ontouchstart' in window;
@@ -183,11 +184,28 @@ async function startTV() {
     mqttTV = await connectMQTT();
     mqttTV.subscribe('mirror/' + room + '/phone');
 
+    let answered = false;
+
+    function sendOffer() {
+      if (!mqttTV || answered) return;
+      mqttTV.send('mirror/'+room+'/tv', JSON.stringify({
+        type:'offer', sdp:offer.sdp,
+        candidates: tvCandidates.map(c => ({
+          candidate:c.candidate, sdpMid:c.sdpMid, sdpMLineIndex:c.sdpMLineIndex
+        }))
+      }));
+    }
+
     mqttTV.onMessageArrived = async (msg) => {
       try {
         const data = JSON.parse(msg.payloadString);
-        if (!pc) return;
-        if (data.type === 'answer') {
+        if (data.type === 'hello') {
+          // Phone just joined — re-send offer immediately
+          tvStatusEl.textContent = 'iPhone connected — sending...';
+          sendOffer();
+        } else if (data.type === 'answer') {
+          answered = true;
+          if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
           await pc.setRemoteDescription({ type: 'answer', sdp: data.sdp });
           data.candidates?.forEach(c => {
             if (c.candidate) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});
@@ -236,12 +254,9 @@ async function startTV() {
     await pc.setLocalDescription(offer);
     await new Promise(r => setTimeout(r, 2000));
 
-    mqttTV.send('mirror/'+room+'/tv', JSON.stringify({
-      type:'offer', sdp:offer.sdp,
-      candidates: tvCandidates.map(c => ({
-        candidate:c.candidate, sdpMid:c.sdpMid, sdpMLineIndex:c.sdpMLineIndex
-      }))
-    }));
+    sendOffer();
+    // Re-send offer every 3 seconds until phone answers
+    retryTimer = setInterval(sendOffer, 3000);
 
     tvStatusEl.textContent = 'Waiting for iPhone...';
 
@@ -256,6 +271,7 @@ async function startTV() {
 }
 
 function cleanupTV() {
+  if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
   if (pc) { pc.close(); pc = null; }
   if (mqttTV) { try { mqttTV.disconnect(); } catch{} mqttTV = null; }
 }
@@ -279,6 +295,9 @@ connectBtn.addEventListener('click', async () => {
   try {
     mqttPhone = await connectMQTT();
     mqttPhone.subscribe('mirror/' + room + '/tv');
+
+    // Tell the TV we're here — triggers immediate offer re-send
+    mqttPhone.send('mirror/' + room + '/phone', JSON.stringify({type:'hello'}));
 
     mqttPhone.onMessageArrived = async (msg) => {
       try {
