@@ -1,53 +1,54 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Screen Test</title></head>
-<body style="background:#000;color:#fff;font-family:monospace;padding:20px;font-size:14px;">
-<h1 id="label">Detecting device...</h1>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Deep Test</title></head>
+<body style="background:#000;color:#fff;font-family:monospace;padding:20px;font-size:13px;">
+<h1>Deep Inspection</h1>
 <div id="out"></div>
-<button id="btn" style="padding:16px 32px;font-size:18px;margin-top:16px;">Test getDisplayMedia</button>
 <script>
 const out = document.getElementById('out');
-const btn = document.getElementById('btn');
-const label = document.getElementById('label');
-
-const isPhone = window.innerWidth < 800 && 'ontouchstart' in window;
-label.textContent = isPhone ? 'THIS IS YOUR PHONE' : 'THIS IS YOUR TV';
-label.style.color = isPhone ? '#4ade80' : '#f87171';
-
 const md = navigator.mediaDevices;
-const gdm = md ? md.getDisplayMedia : undefined;
-const ua = navigator.userAgent;
 
 let html = '';
-html += 'Screen: ' + screen.width + 'x' + screen.height + '<br>';
-html += 'Window: ' + window.innerWidth + 'x' + window.innerHeight + '<br>';
-html += 'Touch: ' + ('ontouchstart' in window ? 'YES' : 'NO') + '<br>';
-html += 'navigator.mediaDevices: ' + (md ? 'YES' : 'NO') + '<br>';
-html += 'getDisplayMedia: ' + (gdm ? 'YES (typeof=' + typeof gdm + ')' : 'MISSING') + '<br>';
-html += 'isSecureContext: ' + (window.isSecureContext ? 'YES' : 'NO') + '<br>';
-html += 'window.safari: ' + (typeof window.safari !== 'undefined' ? 'YES' : 'NO') + '<br>';
-html += 'UA: ' + ua.substring(0, 120) + '<br>';
 
-if (md) {
-  html += '<br>mediaDevices methods: ' + JSON.stringify(Object.keys(Object.getPrototypeOf(md))) + '<br>';
+// Inspect prototype chain
+let obj = md;
+let depth = 0;
+while (obj && depth < 5) {
+  const proto = Object.getPrototypeOf(obj);
+  if (!proto) break;
+
+  // Get ALL properties (not just enumerable)
+  const allProps = Object.getOwnPropertyNames(proto);
+  html += 'Proto level ' + depth + ' own props: ' + JSON.stringify(allProps) + '<br>';
+
+  // Check each for getDisplayMedia
+  for (const prop of allProps) {
+    const desc = Object.getOwnPropertyDescriptor(proto, prop);
+    if (prop.toLowerCase().includes('display') || prop.toLowerCase().includes('screen') || prop.toLowerCase().includes('capture')) {
+      html += '  <b style="color:yellow">FOUND: ' + prop + ' — getter=' + (!!desc.get) + ' value=' + (typeof desc.value) + '</b><br>';
+    }
+  }
+
+  obj = proto;
+  depth++;
 }
 
-out.innerHTML = html;
+// Try MediaDevices constructor
+html += '<br>MediaDevices global: ' + (typeof MediaDevices) + '<br>';
+if (typeof MediaDevices !== 'undefined') {
+  html += 'MediaDevices.prototype props: ' + JSON.stringify(Object.getOwnPropertyNames(MediaDevices.prototype)) + '<br>';
+}
 
-btn.addEventListener('click', async () => {
-  btn.disabled = true;
-  btn.textContent = 'Testing...';
-  try {
-    const stream = await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
-    btn.textContent = 'WORKS!';
-    btn.style.background = 'green';
-    out.innerHTML += '<br><b style="color:green">SUCCESS! getDisplayMedia works!</b>';
-    stream.getTracks().forEach(t => t.stop());
-  } catch(e) {
-    btn.textContent = 'FAILED: ' + e.name;
-    btn.style.background = 'red';
-    out.innerHTML += '<br><b style="color:red">' + e.name + ': ' + e.message + '</b>';
-    btn.disabled = false;
-  }
-});
+// Try direct check with hasOwnProperty via prototype
+const proto = Object.getPrototypeOf(md);
+html += '<br>getDisplayMedia via proto: ' + (proto.getDisplayMedia ? 'YES' : 'NO') + '<br>';
+html += 'getDisplayMedia descriptor: ' + JSON.stringify(Object.getOwnPropertyDescriptor(proto, 'getDisplayMedia')) + '<br>';
+
+// Check if maybe it's on navigator directly?
+html += '<br>navigator.getDisplayMedia: ' + (navigator.getDisplayMedia ? 'YES' : 'NO') + '<br>';
+
+// Check if it requires user activation
+html += 'navigator.userActivation: ' + JSON.stringify(navigator.userActivation) + '<br>';
+
+out.innerHTML = html;
 </script>
 </body></html>
