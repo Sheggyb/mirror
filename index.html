@@ -352,14 +352,18 @@ shareBtn.addEventListener('click', async () => {
     phoneStatus.className = 'phone-status error';
     const ua = navigator.userAgent;
     const iosVer = (/OS (\d+_\d+)/.exec(ua)||['','?'])[1].replace(/_/g,'.');
+    const isRealSafari = /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS/.test(ua) && !navigator.standalone;
+
     helpBox.innerHTML = `
       <div class="help-box">
-        <p><strong>Your browser doesn't support screen sharing.</strong></p>
-        <p>iOS version: ${iosVer} — requires <strong>iOS 16.4 or newer</strong>.</p>
-        <p style="margin-top:8px;">Also make sure:</p>
+        <p><strong>Screen sharing blocked.</strong></p>
+        <p>Your iOS ${iosVer} supports it — but you're likely in an <strong>in-app browser</strong> (opens when you tap a link in Messages, Notes, Camera etc). It looks like Safari but isn't the real one.</p>
+        <p style="margin-top:10px;"><strong>Fix:</strong></p>
         <ol>
-          <li>You opened this page directly in the <strong>Safari app</strong> (not from a link in another app)</li>
-          <li>The URL starts with <strong>https://</strong></li>
+          <li>Copy this URL: <span style="color:#4f46e5;">sheggyb.github.io/mirror</span></li>
+          <li>Go to your iPhone <strong>home screen</strong></li>
+          <li>Open the <strong>Safari app</strong> (blue compass icon)</li>
+          <li>Paste the URL and tap Go</li>
         </ol>
       </div>`;
     return;
