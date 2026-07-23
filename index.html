@@ -2,243 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mari Artistry — Makeup & Beauty</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Snake</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0e0e10;
-    color: #e0dcd5;
-    min-height: 100vh;
-    line-height: 1.5;
+    background: #0a0a0f; display: flex; align-items: center;
+    justify-content: center; height: 100vh; height: 100dvh;
+    font-family: 'Courier New', monospace; overflow: hidden;
+    touch-action: none; user-select: none;
+  }
+  .wrap { text-align: center; }
+  .score {
+    color: #3a3a4a; font-size: 0.75rem; letter-spacing: 4px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .score span { color: #6ee7b7; font-size: 1.2rem; }
+  canvas {
+    border: 1px solid #1a1a2e; border-radius: 4px;
+    display: block; margin: 0 auto;
+  }
+  .controls {
+    display: none; margin-top: 20px;
+    grid-template-areas: '. up .' 'left . right' '. down .';
+    grid-template-columns: repeat(3, 70px);
+    grid-template-rows: repeat(3, 70px); gap: 6px;
+    justify-content: center;
+  }
+  .ctrl {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px;
+    font-size: 1.4rem; color: #6ee7b7; display: flex;
+    align-items: center; justify-content: center; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ctrl:active { background: #2a2a4a; }
+  .up { grid-area: up; } .down { grid-area: down; }
+  .left { grid-area: left; } .right { grid-area: right; }
+
+  .gameover {
+    display: none; color: #6ee7b7; font-size: 1.2rem; margin-top: 16px;
+    letter-spacing: 2px;
+  }
+  .gameover button {
+    display: block; margin: 12px auto 0; padding: 12px 32px;
+    background: #6ee7b7; color: #0a0a0f; border: none; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; text-transform: uppercase;
   }
 
-  /* ─── Hero ─── */
-  .hero {
-    background: linear-gradient(160deg, #1a1020 0%, #0e0b14 40%, #0a0a12 100%);
-    text-align: center;
-    padding: 64px 24px 48px;
-    border-bottom: 1px solid #1e1b24;
+  @media (max-width: 600px) {
+    .controls { display: grid; }
+    canvas { max-width: 94vw; }
   }
-  .hero .logo {
-    font-size: 0.7rem; letter-spacing: 6px; text-transform: uppercase;
-    color: #8b7e74; margin-bottom: 16px;
-  }
-  .hero h1 {
-    font-size: 2.6rem; font-weight: 200; letter-spacing: 4px;
-    color: #d4c5b9;
-  }
-  .hero h1 span { color: #c9956b; font-weight: 400; }
-  .hero .tagline {
-    font-size: 0.8rem; letter-spacing: 5px; text-transform: uppercase;
-    color: #5a5250; margin-top: 12px;
-  }
-  .hero .rating { margin-top: 20px; }
-  .hero .stars { font-size: 0.9rem; letter-spacing: 3px; color: #c9956b; }
-  .hero .review-count { font-size: 0.7rem; color: #5a5250; margin-top: 4px; }
-
-  /* ─── Container ─── */
-  .container { max-width: 520px; margin: 0 auto; padding: 0 24px; }
-
-  /* ─── Sections ─── */
-  .section-label {
-    font-size: 0.6rem; letter-spacing: 5px; text-transform: uppercase;
-    color: #5a5250; margin: 40px 0 16px; text-align: center;
-  }
-
-  /* ─── Services ─── */
-  .services { display: flex; flex-direction: column; gap: 8px; }
-  .svc {
-    background: #151318; border: 1px solid #1e1b24; border-radius: 12px;
-    padding: 18px 20px; display: flex; justify-content: space-between;
-    align-items: center; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .svc:hover { background: #1a1720; }
-  .svc.selected { border-color: #c9956b; background: #1a161e; }
-  .svc .info .name { font-size: 1rem; font-weight: 500; color: #d4c5b9; }
-  .svc .info .desc { font-size: 0.75rem; color: #5a5250; margin-top: 2px; }
-  .svc .meta { text-align: right; }
-  .svc .price { font-size: 1.05rem; font-weight: 600; color: #c9956b; }
-  .svc .dur { font-size: 0.7rem; color: #5a5250; }
-
-  /* ─── Date ─── */
-  .date-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-  .date-btn {
-    flex: 0 0 auto; min-width: 54px; padding: 10px 6px;
-    background: #151318; border: 1px solid #1e1b24; border-radius: 10px;
-    text-align: center; cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .date-btn .dow { font-size: 0.6rem; color: #5a5250; text-transform: uppercase; margin-bottom: 4px; }
-  .date-btn .num { font-size: 1.15rem; font-weight: 600; color: #d4c5b9; }
-  .date-btn .mon { font-size: 0.6rem; color: #5a5250; }
-  .date-btn.selected { border-color: #c9956b; background: #1a161e; }
-
-  /* ─── Time ─── */
-  .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .time-slot {
-    padding: 12px 4px; background: #151318; border: 1px solid #1e1b24;
-    border-radius: 8px; text-align: center; cursor: pointer;
-    font-size: 0.78rem; color: #d4c5b9; font-weight: 500;
-    transition: border-color 0.2s;
-  }
-  .time-slot.selected { border-color: #c9956b; background: #1a161e; color: #c9956b; }
-
-  /* ─── Form ─── */
-  .field { margin-bottom: 12px; }
-  .field label {
-    display: block; font-size: 0.65rem; letter-spacing: 2px;
-    text-transform: uppercase; color: #5a5250; margin-bottom: 6px;
-  }
-  .field input, .field textarea {
-    width: 100%; padding: 14px 16px; background: #151318;
-    border: 1px solid #1e1b24; border-radius: 10px;
-    font-size: 0.95rem; color: #d4c5b9; outline: none;
-    font-family: inherit;
-  }
-  .field input:focus, .field textarea:focus { border-color: #c9956b; }
-  .field textarea { resize: vertical; min-height: 70px; }
-
-  /* ─── Button ─── */
-  .btn {
-    width: 100%; padding: 16px; background: #c9956b; color: #0e0e10;
-    border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600;
-    letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
-    margin: 24px 0 48px; transition: background 0.2s, opacity 0.2s;
-  }
-  .btn:hover { background: #d4a87e; }
-  .btn:disabled { background: #2a2528; color: #5a5250; cursor: not-allowed; }
-
-  /* ─── Confirmation ─── */
-  .confirm {
-    display: none; background: #151318; border: 1px solid #1e1b24;
-    border-radius: 16px; padding: 40px 24px; text-align: center; margin-bottom: 40px;
-  }
-  .confirm .icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .confirm h2 { font-size: 1.3rem; font-weight: 300; color: #d4c5b9; margin-bottom: 16px; }
-  .confirm .details { font-size: 0.85rem; color: #8b7e74; line-height: 2; }
-
-  .footer { text-align: center; padding: 24px; color: #2a2528; font-size: 0.7rem; letter-spacing: 2px; }
 </style>
 </head>
 <body>
-
-<div class="hero">
-  <div class="logo">Stockholm · Since 2022</div>
-  <h1>Mari <span>Artistry</span></h1>
-  <p class="tagline">Makeup & Beauty</p>
-  <div class="rating">
-    <div class="stars">★★★★★</div>
-    <div class="review-count">4.9 · 340+ reviews</div>
+<div class="wrap">
+  <div class="score">Score <span id="scoreVal">0</span></div>
+  <canvas id="c"></canvas>
+  <div class="controls" id="controls">
+    <div class="ctrl up" data-dir="up">▲</div>
+    <div class="ctrl left" data-dir="left">◀</div>
+    <div class="ctrl right" data-dir="right">▶</div>
+    <div class="ctrl down" data-dir="down">▼</div>
+  </div>
+  <div class="gameover" id="go">
+    Game Over
+    <button id="restart">Play Again</button>
   </div>
 </div>
-
-<div class="container">
-
-  <p class="section-label">Select service</p>
-  <div class="services" id="services">
-    <div class="svc" data-name="Bridal Package" data-price="1 400 kr" data-dur="120 min">
-      <div class="info"><div class="name">Bridal Package</div><div class="desc">Trial + day-of. Long-lasting, camera-ready.</div></div>
-      <div class="meta"><div class="price">1 400 kr</div><div class="dur">120 min</div></div>
-    </div>
-    <div class="svc" data-name="Evening Glam" data-price="850 kr" data-dur="75 min">
-      <div class="info"><div class="name">Evening Glam</div><div class="desc">Full face. Bold eyes or classic smokey.</div></div>
-      <div class="meta"><div class="price">850 kr</div><div class="dur">75 min</div></div>
-    </div>
-    <div class="svc" data-name="Natural Radiance" data-price="650 kr" data-dur="50 min">
-      <div class="info"><div class="name">Natural Radiance</div><div class="desc">Fresh, dewy, minimal — your skin but better.</div></div>
-      <div class="meta"><div class="price">650 kr</div><div class="dur">50 min</div></div>
-    </div>
-    <div class="svc" data-name="1-on-1 Lesson" data-price="950 kr" data-dur="90 min">
-      <div class="info"><div class="name">1-on-1 Lesson</div><div class="desc">Learn techniques tailored to your features.</div></div>
-      <div class="meta"><div class="price">950 kr</div><div class="dur">90 min</div></div>
-    </div>
-  </div>
-
-  <p class="section-label">Select date</p>
-  <div class="date-row" id="dates"></div>
-
-  <p class="section-label">Select time</p>
-  <div class="time-grid" id="times">
-    <div class="time-slot">09:00</div><div class="time-slot">10:00</div>
-    <div class="time-slot">11:00</div><div class="time-slot">12:00</div>
-    <div class="time-slot">13:00</div><div class="time-slot">14:00</div>
-    <div class="time-slot">15:00</div><div class="time-slot">16:00</div>
-    <div class="time-slot">17:00</div><div class="time-slot">18:00</div>
-    <div class="time-slot">19:00</div><div class="time-slot">20:00</div>
-  </div>
-
-  <p class="section-label">Your details</p>
-  <div class="field"><input type="text" id="fullname" placeholder="Full name"></div>
-  <div class="field"><input type="tel" id="phone" placeholder="Phone number"></div>
-  <div class="field"><textarea id="notes" placeholder="Any notes or allergies? (optional)"></textarea></div>
-
-  <button class="btn" id="bookBtn" disabled>Reserve</button>
-
-  <div class="confirm" id="confirmBox">
-    <div class="icon">✨</div>
-    <h2>You're all set</h2>
-    <div class="details" id="confirmDetail"></div>
-  </div>
-
-</div>
-
-<div class="footer">Mari Artistry © 2026</div>
 
 <script>
-const S = { svc: null, date: null, time: null };
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('scoreVal');
+const goDiv = document.getElementById('go');
+const isMobile = window.innerWidth < 600;
+if (isMobile) document.getElementById('controls').style.display = 'grid';
 
-// Dates
-const datesDiv = document.getElementById('dates');
-const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const now = new Date();
-for (let i = 0; i < 7; i++) {
-  const d = new Date(now); d.setDate(now.getDate() + i);
-  const b = document.createElement('div'); b.className = 'date-btn';
-  b.innerHTML = `<div class="dow">${days[d.getDay()]}</div><div class="num">${d.getDate()}</div><div class="mon">${months[d.getMonth()]}</div>`;
-  b.dataset.date = d.toDateString();
-  b.addEventListener('click', () => {
-    document.querySelectorAll('.date-btn').forEach(x => x.classList.remove('selected'));
-    b.classList.add('selected'); S.date = d.toDateString(); check();
-  });
-  datesDiv.appendChild(b);
+const SIZE = isMobile ? Math.min(window.innerWidth - 24, 380) : 400;
+const GRID = 20;
+const CELL = SIZE / GRID;
+canvas.width = SIZE; canvas.height = SIZE;
+
+let snake, food, dir, nextDir, score, speed, loop;
+
+function init() {
+  snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+  dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
+  score = 0; speed = 100;
+  scoreEl.textContent = '0';
+  goDiv.style.display = 'none';
+  placeFood();
+  if (loop) clearInterval(loop);
+  loop = setInterval(tick, speed);
 }
 
-// Services
-document.querySelectorAll('.svc').forEach(c => {
-  c.addEventListener('click', () => {
-    document.querySelectorAll('.svc').forEach(x => x.classList.remove('selected'));
-    c.classList.add('selected'); S.svc = c.dataset; check();
-  });
-});
-
-// Times
-document.querySelectorAll('.time-slot').forEach(s => {
-  s.addEventListener('click', () => {
-    document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
-    s.classList.add('selected'); S.time = s.textContent; check();
-  });
-});
-
-function check() {
-  const n = document.getElementById('fullname').value.trim();
-  document.getElementById('bookBtn').disabled = !(n && S.svc && S.date && S.time);
+function placeFood() {
+  do {
+    food = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+  } while (snake.some(s => s.x === food.x && s.y === food.y));
 }
-document.getElementById('fullname').addEventListener('input', check);
 
-document.getElementById('bookBtn').addEventListener('click', () => {
-  const n = document.getElementById('fullname').value.trim();
-  document.getElementById('confirmDetail').innerHTML =
-    `<strong>${n}</strong><br>${S.svc.name} · ${S.svc.price}<br>${S.date} at ${S.time}<br>${S.svc.dur}`;
-  document.getElementById('confirmBox').style.display = 'block';
-  document.getElementById('bookBtn').style.display = 'none';
-  document.getElementById('confirmBox').scrollIntoView({ behavior: 'smooth' });
+function tick() {
+  dir = nextDir;
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+  if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID ||
+      snake.some(s => s.x === head.x && s.y === head.y)) {
+    clearInterval(loop);
+    goDiv.style.display = 'block';
+    return;
+  }
+
+  snake.unshift(head);
+  if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    scoreEl.textContent = score;
+    placeFood();
+    if (speed > 50) { clearInterval(loop); speed -= 2; loop = setInterval(tick, speed); }
+  } else {
+    snake.pop();
+  }
+  draw();
+}
+
+function draw() {
+  ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0, 0, SIZE, SIZE);
+  // Grid
+  ctx.strokeStyle = '#111122'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= GRID; i++) {
+    ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, SIZE); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(SIZE, i * CELL); ctx.stroke();
+  }
+  // Food
+  ctx.fillStyle = '#f87171'; ctx.shadowColor = '#f87171'; ctx.shadowBlur = 8;
+  ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
+  ctx.shadowBlur = 0;
+  // Snake
+  snake.forEach((s, i) => {
+    const alpha = 1 - (i / (snake.length + 10)) * 0.5;
+    ctx.fillStyle = i === 0 ? '#6ee7b7' : `rgba(110,231,183,${alpha})`;
+    ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
+  });
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right' };
+  const d = map[e.key];
+  if (d === 'up' && dir.y !== 1) nextDir = { x: 0, y: -1 };
+  if (d === 'down' && dir.y !== -1) nextDir = { x: 0, y: 1 };
+  if (d === 'left' && dir.x !== 1) nextDir = { x: -1, y: 0 };
+  if (d === 'right' && dir.x !== -1) nextDir = { x: 1, y: 0 };
 });
+
+// Touch controls
+document.querySelectorAll('.ctrl').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const d = btn.dataset.dir;
+    if (d === 'up' && dir.y !== 1) nextDir = { x: 0, y: -1 };
+    if (d === 'down' && dir.y !== -1) nextDir = { x: 0, y: 1 };
+    if (d === 'left' && dir.x !== 1) nextDir = { x: -1, y: 0 };
+    if (d === 'right' && dir.x !== -1) nextDir = { x: 1, y: 0 };
+  });
+});
+
+// Swipe
+let touchX, touchY;
+canvas.addEventListener('touchstart', e => {
+  touchX = e.touches[0].clientX; touchY = e.touches[0].clientY;
+});
+canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  const dy = e.changedTouches[0].clientY - touchY;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 30 && dir.x !== -1) nextDir = { x: 1, y: 0 };
+    else if (dx < -30 && dir.x !== 1) nextDir = { x: -1, y: 0 };
+  } else {
+    if (dy > 30 && dir.y !== -1) nextDir = { x: 0, y: 1 };
+    else if (dy < -30 && dir.y !== 1) nextDir = { x: 0, y: -1 };
+  }
+});
+
+document.getElementById('restart').addEventListener('click', init);
+
+init();
+draw();
 </script>
-
 </body>
 </html>
