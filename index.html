@@ -3,143 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glow Makeup Studio</title>
+<title>Mari Artistry — Makeup & Beauty</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #faf5f0;
-    color: #3d2c2c;
+    font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0e0e10;
+    color: #e0dcd5;
     min-height: 100vh;
+    line-height: 1.5;
   }
 
-  /* Hero */
+  /* ─── Hero ─── */
   .hero {
-    background: linear-gradient(135deg, #d4a5a5 0%, #c99595 40%, #b88080 100%);
-    color: #fff;
+    background: linear-gradient(160deg, #1a1020 0%, #0e0b14 40%, #0a0a12 100%);
     text-align: center;
-    padding: 60px 20px 50px;
+    padding: 64px 24px 48px;
+    border-bottom: 1px solid #1e1b24;
   }
-  .hero h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 8px; }
-  .hero .tagline { font-size: 0.9rem; opacity: 0.85; letter-spacing: 3px; text-transform: uppercase; }
-  .hero .stars { font-size: 1rem; margin: 12px 0 4px; }
-  .hero .reviews { font-size: 0.8rem; opacity: 0.8; }
+  .hero .logo {
+    font-size: 0.7rem; letter-spacing: 6px; text-transform: uppercase;
+    color: #8b7e74; margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 2.6rem; font-weight: 200; letter-spacing: 4px;
+    color: #d4c5b9;
+  }
+  .hero h1 span { color: #c9956b; font-weight: 400; }
+  .hero .tagline {
+    font-size: 0.8rem; letter-spacing: 5px; text-transform: uppercase;
+    color: #5a5250; margin-top: 12px;
+  }
+  .hero .rating { margin-top: 20px; }
+  .hero .stars { font-size: 0.9rem; letter-spacing: 3px; color: #c9956b; }
+  .hero .review-count { font-size: 0.7rem; color: #5a5250; margin-top: 4px; }
 
-  .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+  /* ─── Container ─── */
+  .container { max-width: 520px; margin: 0 auto; padding: 0 24px; }
 
-  /* Service cards */
-  .section-title {
-    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
-    color: #b88080; margin: 32px 0 14px; text-align: center;
+  /* ─── Sections ─── */
+  .section-label {
+    font-size: 0.6rem; letter-spacing: 5px; text-transform: uppercase;
+    color: #5a5250; margin: 40px 0 16px; text-align: center;
   }
-  .services { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
-  .service-card {
-    background: #fff; border-radius: 16px; padding: 18px 20px;
-    display: flex; justify-content: space-between; align-items: center;
-    cursor: pointer; border: 2px solid transparent;
-    transition: border 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-  .service-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-  .service-card.selected { border-color: #b88080; box-shadow: 0 4px 16px rgba(184,128,128,0.2); }
-  .service-card .name { font-size: 1rem; font-weight: 500; }
-  .service-card .dur { font-size: 0.8rem; color: #999; margin-top: 2px; }
-  .service-card .price { font-size: 1.1rem; font-weight: 600; color: #b88080; }
 
-  /* Date picker */
-  .date-row {
-    display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto;
-    padding-bottom: 4px;
+  /* ─── Services ─── */
+  .services { display: flex; flex-direction: column; gap: 8px; }
+  .svc {
+    background: #151318; border: 1px solid #1e1b24; border-radius: 12px;
+    padding: 18px 20px; display: flex; justify-content: space-between;
+    align-items: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
   }
+  .svc:hover { background: #1a1720; }
+  .svc.selected { border-color: #c9956b; background: #1a161e; }
+  .svc .info .name { font-size: 1rem; font-weight: 500; color: #d4c5b9; }
+  .svc .info .desc { font-size: 0.75rem; color: #5a5250; margin-top: 2px; }
+  .svc .meta { text-align: right; }
+  .svc .price { font-size: 1.05rem; font-weight: 600; color: #c9956b; }
+  .svc .dur { font-size: 0.7rem; color: #5a5250; }
+
+  /* ─── Date ─── */
+  .date-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
   .date-btn {
-    flex: 0 0 auto; min-width: 56px; padding: 12px 8px;
-    background: #fff; border: 2px solid #eee; border-radius: 14px;
-    text-align: center; cursor: pointer; font-size: 0.75rem;
-    transition: border 0.2s;
+    flex: 0 0 auto; min-width: 54px; padding: 10px 6px;
+    background: #151318; border: 1px solid #1e1b24; border-radius: 10px;
+    text-align: center; cursor: pointer;
+    transition: border-color 0.2s;
   }
-  .date-btn .day { font-size: 0.65rem; color: #999; text-transform: uppercase; margin-bottom: 4px; }
-  .date-btn .num { font-size: 1.2rem; font-weight: 600; }
-  .date-btn.selected { border-color: #b88080; background: #fdf5f5; }
+  .date-btn .dow { font-size: 0.6rem; color: #5a5250; text-transform: uppercase; margin-bottom: 4px; }
+  .date-btn .num { font-size: 1.15rem; font-weight: 600; color: #d4c5b9; }
+  .date-btn .mon { font-size: 0.6rem; color: #5a5250; }
+  .date-btn.selected { border-color: #c9956b; background: #1a161e; }
 
-  /* Time slots */
-  .time-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-    margin-bottom: 30px;
-  }
+  /* ─── Time ─── */
+  .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .time-slot {
-    padding: 10px 6px; background: #fff; border: 2px solid #eee;
-    border-radius: 10px; text-align: center; cursor: pointer;
-    font-size: 0.8rem; font-weight: 500;
+    padding: 12px 4px; background: #151318; border: 1px solid #1e1b24;
+    border-radius: 8px; text-align: center; cursor: pointer;
+    font-size: 0.78rem; color: #d4c5b9; font-weight: 500;
+    transition: border-color 0.2s;
   }
-  .time-slot.selected { border-color: #b88080; background: #fdf5f5; }
+  .time-slot.selected { border-color: #c9956b; background: #1a161e; color: #c9956b; }
 
-  /* Form */
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 4px; }
-  .form-group input {
-    width: 100%; padding: 14px 16px; border: 2px solid #eee; border-radius: 14px;
-    font-size: 1rem; outline: none; background: #fff;
+  /* ─── Form ─── */
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block; font-size: 0.65rem; letter-spacing: 2px;
+    text-transform: uppercase; color: #5a5250; margin-bottom: 6px;
   }
-  .form-group input:focus { border-color: #b88080; }
-
-  /* Book button */
-  .book-btn {
-    width: 100%; padding: 18px; background: #b88080; color: #fff;
-    border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600;
-    cursor: pointer; letter-spacing: 1px; margin: 10px 0 40px;
-    transition: background 0.2s;
+  .field input, .field textarea {
+    width: 100%; padding: 14px 16px; background: #151318;
+    border: 1px solid #1e1b24; border-radius: 10px;
+    font-size: 0.95rem; color: #d4c5b9; outline: none;
+    font-family: inherit;
   }
-  .book-btn:hover { background: #a06c6c; }
-  .book-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .field input:focus, .field textarea:focus { border-color: #c9956b; }
+  .field textarea { resize: vertical; min-height: 70px; }
 
-  /* Confirmation */
-  .confirm-box {
-    display: none; background: #fff; border-radius: 20px; padding: 40px 24px;
-    text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    margin-bottom: 40px;
+  /* ─── Button ─── */
+  .btn {
+    width: 100%; padding: 16px; background: #c9956b; color: #0e0e10;
+    border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
+    margin: 24px 0 48px; transition: background 0.2s, opacity 0.2s;
   }
-  .confirm-box .check { font-size: 3rem; margin-bottom: 12px; }
-  .confirm-box h2 { font-size: 1.4rem; color: #b88080; margin-bottom: 8px; }
-  .confirm-box .detail { font-size: 0.9rem; color: #666; line-height: 1.8; }
+  .btn:hover { background: #d4a87e; }
+  .btn:disabled { background: #2a2528; color: #5a5250; cursor: not-allowed; }
 
-  footer { text-align: center; padding: 20px; color: #ccc; font-size: 0.75rem; }
+  /* ─── Confirmation ─── */
+  .confirm {
+    display: none; background: #151318; border: 1px solid #1e1b24;
+    border-radius: 16px; padding: 40px 24px; text-align: center; margin-bottom: 40px;
+  }
+  .confirm .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .confirm h2 { font-size: 1.3rem; font-weight: 300; color: #d4c5b9; margin-bottom: 16px; }
+  .confirm .details { font-size: 0.85rem; color: #8b7e74; line-height: 2; }
+
+  .footer { text-align: center; padding: 24px; color: #2a2528; font-size: 0.7rem; letter-spacing: 2px; }
 </style>
 </head>
 <body>
 
 <div class="hero">
-  <h1>Glow Makeup Studio</h1>
-  <p class="tagline">Book Your Session</p>
-  <p class="stars">★★★★★</p>
-  <p class="reviews">4.9 — 200+ reviews</p>
+  <div class="logo">Stockholm · Since 2022</div>
+  <h1>Mari <span>Artistry</span></h1>
+  <p class="tagline">Makeup & Beauty</p>
+  <div class="rating">
+    <div class="stars">★★★★★</div>
+    <div class="review-count">4.9 · 340+ reviews</div>
+  </div>
 </div>
 
 <div class="container">
 
-  <p class="section-title">Select Service</p>
+  <p class="section-label">Select service</p>
   <div class="services" id="services">
-    <div class="service-card" data-service="bridal" data-price="1200" data-dur="90 min">
-      <div><div class="name">Bridal Makeup</div><div class="dur">90 min</div></div>
-      <div class="price">1 200 kr</div>
+    <div class="svc" data-name="Bridal Package" data-price="1 400 kr" data-dur="120 min">
+      <div class="info"><div class="name">Bridal Package</div><div class="desc">Trial + day-of. Long-lasting, camera-ready.</div></div>
+      <div class="meta"><div class="price">1 400 kr</div><div class="dur">120 min</div></div>
     </div>
-    <div class="service-card" data-service="evening" data-price="800" data-dur="60 min">
-      <div><div class="name">Evening Glam</div><div class="dur">60 min</div></div>
-      <div class="price">800 kr</div>
+    <div class="svc" data-name="Evening Glam" data-price="850 kr" data-dur="75 min">
+      <div class="info"><div class="name">Evening Glam</div><div class="desc">Full face. Bold eyes or classic smokey.</div></div>
+      <div class="meta"><div class="price">850 kr</div><div class="dur">75 min</div></div>
     </div>
-    <div class="service-card" data-service="natural" data-price="600" data-dur="45 min">
-      <div><div class="name">Natural Look</div><div class="dur">45 min</div></div>
-      <div class="price">600 kr</div>
+    <div class="svc" data-name="Natural Radiance" data-price="650 kr" data-dur="50 min">
+      <div class="info"><div class="name">Natural Radiance</div><div class="desc">Fresh, dewy, minimal — your skin but better.</div></div>
+      <div class="meta"><div class="price">650 kr</div><div class="dur">50 min</div></div>
     </div>
-    <div class="service-card" data-service="lesson" data-price="900" data-dur="75 min">
-      <div><div class="name">Makeup Lesson</div><div class="dur">75 min</div></div>
-      <div class="price">900 kr</div>
+    <div class="svc" data-name="1-on-1 Lesson" data-price="950 kr" data-dur="90 min">
+      <div class="info"><div class="name">1-on-1 Lesson</div><div class="desc">Learn techniques tailored to your features.</div></div>
+      <div class="meta"><div class="price">950 kr</div><div class="dur">90 min</div></div>
     </div>
   </div>
 
-  <p class="section-title">Select Date</p>
+  <p class="section-label">Select date</p>
   <div class="date-row" id="dates"></div>
 
-  <p class="section-title">Select Time</p>
+  <p class="section-label">Select time</p>
   <div class="time-grid" id="times">
     <div class="time-slot">09:00</div><div class="time-slot">10:00</div>
     <div class="time-slot">11:00</div><div class="time-slot">12:00</div>
@@ -149,84 +171,69 @@
     <div class="time-slot">19:00</div><div class="time-slot">20:00</div>
   </div>
 
-  <p class="section-title">Your Info</p>
-  <div class="form-group"><input type="text" id="name" placeholder="Full name"></div>
-  <div class="form-group"><input type="tel" id="phone" placeholder="Phone number"></div>
+  <p class="section-label">Your details</p>
+  <div class="field"><input type="text" id="fullname" placeholder="Full name"></div>
+  <div class="field"><input type="tel" id="phone" placeholder="Phone number"></div>
+  <div class="field"><textarea id="notes" placeholder="Any notes or allergies? (optional)"></textarea></div>
 
-  <button class="book-btn" id="bookBtn" disabled>Book Appointment</button>
+  <button class="btn" id="bookBtn" disabled>Reserve</button>
 
-  <div class="confirm-box" id="confirmBox">
-    <div class="check">✨</div>
-    <h2>Booked!</h2>
-    <div class="detail" id="confirmDetail"></div>
+  <div class="confirm" id="confirmBox">
+    <div class="icon">✨</div>
+    <h2>You're all set</h2>
+    <div class="details" id="confirmDetail"></div>
   </div>
 
 </div>
 
-<footer>Glow Makeup Studio © 2026</footer>
+<div class="footer">Mari Artistry © 2026</div>
 
 <script>
-let selected = { service: null, date: null, time: null };
+const S = { svc: null, date: null, time: null };
 
-// Generate next 7 days
+// Dates
 const datesDiv = document.getElementById('dates');
 const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const today = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const now = new Date();
 for (let i = 0; i < 7; i++) {
-  const d = new Date(today);
-  d.setDate(today.getDate() + i);
-  const btn = document.createElement('div');
-  btn.className = 'date-btn';
-  btn.innerHTML = `<div class="day">${days[d.getDay()]}</div><div class="num">${d.getDate()}</div>`;
-  btn.dataset.date = d.toDateString();
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selected.date = d.toDateString();
-    checkReady();
+  const d = new Date(now); d.setDate(now.getDate() + i);
+  const b = document.createElement('div'); b.className = 'date-btn';
+  b.innerHTML = `<div class="dow">${days[d.getDay()]}</div><div class="num">${d.getDate()}</div><div class="mon">${months[d.getMonth()]}</div>`;
+  b.dataset.date = d.toDateString();
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.date-btn').forEach(x => x.classList.remove('selected'));
+    b.classList.add('selected'); S.date = d.toDateString(); check();
   });
-  datesDiv.appendChild(btn);
+  datesDiv.appendChild(b);
 }
 
-// Service selection
-document.querySelectorAll('.service-card').forEach(card => {
-  card.addEventListener('click', () => {
-    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    selected.service = card.dataset;
-    checkReady();
+// Services
+document.querySelectorAll('.svc').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.svc').forEach(x => x.classList.remove('selected'));
+    c.classList.add('selected'); S.svc = c.dataset; check();
   });
 });
 
-// Time selection
-document.querySelectorAll('.time-slot').forEach(slot => {
-  slot.addEventListener('click', () => {
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-    slot.classList.add('selected');
-    selected.time = slot.textContent;
-    checkReady();
+// Times
+document.querySelectorAll('.time-slot').forEach(s => {
+  s.addEventListener('click', () => {
+    document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
+    s.classList.add('selected'); S.time = s.textContent; check();
   });
 });
 
-function checkReady() {
-  const btn = document.getElementById('bookBtn');
-  const name = document.getElementById('name').value.trim();
-  if (name && selected.service && selected.date && selected.time) {
-    btn.disabled = false;
-  } else {
-    btn.disabled = true;
-  }
+function check() {
+  const n = document.getElementById('fullname').value.trim();
+  document.getElementById('bookBtn').disabled = !(n && S.svc && S.date && S.time);
 }
-
-document.getElementById('name').addEventListener('input', checkReady);
+document.getElementById('fullname').addEventListener('input', check);
 
 document.getElementById('bookBtn').addEventListener('click', () => {
-  const name = document.getElementById('name').value.trim();
+  const n = document.getElementById('fullname').value.trim();
   document.getElementById('confirmDetail').innerHTML =
-    `<strong>${name}</strong><br>
-     ${selected.service.name} · ${selected.service.price} kr<br>
-     ${selected.date} at ${selected.time}<br>
-     Duration: ${selected.service.dur}`;
+    `<strong>${n}</strong><br>${S.svc.name} · ${S.svc.price}<br>${S.date} at ${S.time}<br>${S.svc.dur}`;
   document.getElementById('confirmBox').style.display = 'block';
   document.getElementById('bookBtn').style.display = 'none';
   document.getElementById('confirmBox').scrollIntoView({ behavior: 'smooth' });
