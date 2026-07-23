@@ -2,467 +2,236 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta http-equiv="Permissions-Policy" content="display-capture=(self)">
-<title>Screen Mirror</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Makeup Studio</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #000; color: #fff;
-    min-height: 100vh; min-height: 100dvh;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .hidden { display: none !important; }
-
-  #tvView { text-align: center; padding: 5vh 5vw; width: 100%; }
-  #tvView .room-word {
-    font-size: min(22vw, 14rem); font-weight: 900;
-    letter-spacing: 0.15em; color: #4f46e5; line-height: 1;
-  }
-  #tvView .room-hint {
-    font-size: min(4vw, 1.5rem); color: #555; margin-top: 3vh;
-  }
-  #tvView .tv-status {
-    font-size: min(3vw, 1.2rem); color: #555; margin-top: 3vh;
-  }
-  #tvView .tv-status.ok { color: #4ade80; }
-  #tvView .tv-status.error { color: #f87171; }
-
-  #phoneView { width: 100%; max-width: 400px; padding: 24px; text-align: center; }
-  #phoneView h1 { font-size: 1.5rem; margin-bottom: 4px; }
-  #phoneView .sub { color: #999; font-size: 0.85rem; margin-bottom: 24px; }
-  #phoneView .big-btn {
-    display: block; width: 100%; padding: 20px; border: none;
-    border-radius: 14px; font-size: 1.2rem; font-weight: 700;
-    cursor: pointer; color: #fff; background: #4f46e5;
-  }
-  #phoneView .big-btn:active { opacity: 0.7; }
-  #phoneView .big-btn:disabled { opacity: 0.4; }
-  #phoneView .big-btn.share { background: #059669; }
-  #phoneView .big-btn.stop { background: #dc2626; }
-
-  #phoneView .phone-status {
-    font-size: 0.9rem; color: #bbb; margin-top: 14px; min-height: 1.2em;
-  }
-  #phoneView .phone-status.error { color: #f87171; }
-  #phoneView .phone-status.ok { color: #4ade80; }
-
-  #phoneView .scan-progress {
-    width: 100%; height: 4px; background: #222; border-radius: 2px;
-    margin-top: 16px; overflow: hidden;
-  }
-  #phoneView .scan-bar {
-    height: 100%; background: #4f46e5;
-    transition: width 0.3s; width: 0%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #faf5f0;
+    color: #3d2c2c;
+    min-height: 100vh;
   }
 
-  #videoOverlay {
-    position: fixed; inset: 0; background: #000;
-    display: none; z-index: 100;
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #d4a5a5 0%, #c99595 40%, #b88080 100%);
+    color: #fff;
+    text-align: center;
+    padding: 60px 20px 50px;
   }
-  #videoOverlay video { width: 100%; height: 100%; object-fit: contain; }
+  .hero h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 8px; }
+  .hero .tagline { font-size: 0.9rem; opacity: 0.85; letter-spacing: 3px; text-transform: uppercase; }
+  .hero .stars { font-size: 1rem; margin: 12px 0 4px; }
+  .hero .reviews { font-size: 0.8rem; opacity: 0.8; }
 
-  .help-box {
-    background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px;
-    text-align: left; line-height: 1.7; font-size: 0.85rem;
+  .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+
+  /* Service cards */
+  .section-title {
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+    color: #b88080; margin: 32px 0 14px; text-align: center;
   }
-  .help-box p { color: #ccc; margin-bottom: 6px; }
-  .help-box strong { color: #f87171; }
+  .services { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
+  .service-card {
+    background: #fff; border-radius: 16px; padding: 18px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; border: 2px solid transparent;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .service-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .service-card.selected { border-color: #b88080; box-shadow: 0 4px 16px rgba(184,128,128,0.2); }
+  .service-card .name { font-size: 1rem; font-weight: 500; }
+  .service-card .dur { font-size: 0.8rem; color: #999; margin-top: 2px; }
+  .service-card .price { font-size: 1.1rem; font-weight: 600; color: #b88080; }
+
+  /* Date picker */
+  .date-row {
+    display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .date-btn {
+    flex: 0 0 auto; min-width: 56px; padding: 12px 8px;
+    background: #fff; border: 2px solid #eee; border-radius: 14px;
+    text-align: center; cursor: pointer; font-size: 0.75rem;
+    transition: border 0.2s;
+  }
+  .date-btn .day { font-size: 0.65rem; color: #999; text-transform: uppercase; margin-bottom: 4px; }
+  .date-btn .num { font-size: 1.2rem; font-weight: 600; }
+  .date-btn.selected { border-color: #b88080; background: #fdf5f5; }
+
+  /* Time slots */
+  .time-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    margin-bottom: 30px;
+  }
+  .time-slot {
+    padding: 10px 6px; background: #fff; border: 2px solid #eee;
+    border-radius: 10px; text-align: center; cursor: pointer;
+    font-size: 0.8rem; font-weight: 500;
+  }
+  .time-slot.selected { border-color: #b88080; background: #fdf5f5; }
+
+  /* Form */
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 4px; }
+  .form-group input {
+    width: 100%; padding: 14px 16px; border: 2px solid #eee; border-radius: 14px;
+    font-size: 1rem; outline: none; background: #fff;
+  }
+  .form-group input:focus { border-color: #b88080; }
+
+  /* Book button */
+  .book-btn {
+    width: 100%; padding: 18px; background: #b88080; color: #fff;
+    border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600;
+    cursor: pointer; letter-spacing: 1px; margin: 10px 0 40px;
+    transition: background 0.2s;
+  }
+  .book-btn:hover { background: #a06c6c; }
+  .book-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* Confirmation */
+  .confirm-box {
+    display: none; background: #fff; border-radius: 20px; padding: 40px 24px;
+    text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+  }
+  .confirm-box .check { font-size: 3rem; margin-bottom: 12px; }
+  .confirm-box h2 { font-size: 1.4rem; color: #b88080; margin-bottom: 8px; }
+  .confirm-box .detail { font-size: 0.9rem; color: #666; line-height: 1.8; }
+
+  footer { text-align: center; padding: 20px; color: #ccc; font-size: 0.75rem; }
 </style>
 </head>
 <body>
 
-<div id="tvView" class="hidden">
-  <div class="room-word" id="roomWord">....</div>
-  <div class="room-hint">📺 TV — iPhone should find this automatically<br>or type this number on your phone</div>
-  <div class="tv-status" id="tvStatus">Setting up...</div>
+<div class="hero">
+  <h1>Glow Makeup Studio</h1>
+  <p class="tagline">Book Your Session</p>
+  <p class="stars">★★★★★</p>
+  <p class="reviews">4.9 — 200+ reviews</p>
 </div>
 
-<div id="phoneView" class="hidden">
-  <h1>📱 Screen Mirror</h1>
-  <p class="sub" id="phoneSub">Scanning your network for the TV...</p>
-  <div class="scan-progress"><div class="scan-bar" id="scanBar"></div></div>
-  <button class="big-btn hidden" id="shareBtn">Share Screen</button>
-  <button class="big-btn stop hidden" id="stopBtn">Stop Sharing</button>
-  <div class="phone-status" id="phoneStatus"></div>
-  <div id="helpBox"></div>
+<div class="container">
+
+  <p class="section-title">Select Service</p>
+  <div class="services" id="services">
+    <div class="service-card" data-service="bridal" data-price="1200" data-dur="90 min">
+      <div><div class="name">Bridal Makeup</div><div class="dur">90 min</div></div>
+      <div class="price">1 200 kr</div>
+    </div>
+    <div class="service-card" data-service="evening" data-price="800" data-dur="60 min">
+      <div><div class="name">Evening Glam</div><div class="dur">60 min</div></div>
+      <div class="price">800 kr</div>
+    </div>
+    <div class="service-card" data-service="natural" data-price="600" data-dur="45 min">
+      <div><div class="name">Natural Look</div><div class="dur">45 min</div></div>
+      <div class="price">600 kr</div>
+    </div>
+    <div class="service-card" data-service="lesson" data-price="900" data-dur="75 min">
+      <div><div class="name">Makeup Lesson</div><div class="dur">75 min</div></div>
+      <div class="price">900 kr</div>
+    </div>
+  </div>
+
+  <p class="section-title">Select Date</p>
+  <div class="date-row" id="dates"></div>
+
+  <p class="section-title">Select Time</p>
+  <div class="time-grid" id="times">
+    <div class="time-slot">09:00</div><div class="time-slot">10:00</div>
+    <div class="time-slot">11:00</div><div class="time-slot">12:00</div>
+    <div class="time-slot">13:00</div><div class="time-slot">14:00</div>
+    <div class="time-slot">15:00</div><div class="time-slot">16:00</div>
+    <div class="time-slot">17:00</div><div class="time-slot">18:00</div>
+    <div class="time-slot">19:00</div><div class="time-slot">20:00</div>
+  </div>
+
+  <p class="section-title">Your Info</p>
+  <div class="form-group"><input type="text" id="name" placeholder="Full name"></div>
+  <div class="form-group"><input type="tel" id="phone" placeholder="Phone number"></div>
+
+  <button class="book-btn" id="bookBtn" disabled>Book Appointment</button>
+
+  <div class="confirm-box" id="confirmBox">
+    <div class="check">✨</div>
+    <h2>Booked!</h2>
+    <div class="detail" id="confirmDetail"></div>
+  </div>
+
 </div>
 
-<div id="videoOverlay">
-  <video id="remoteVideo" autoplay playsinline></video>
-</div>
+<footer>Glow Makeup Studio © 2026</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
 <script>
-const MQTT_HOST = 'broker.emqx.io';
-const MQTT_PORT = 8084;
-const MQTT_PATH = '/mqtt';
+let selected = { service: null, date: null, time: null };
 
-const ice = { iceServers: [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' }
-]};
-
-const tvView = document.getElementById('tvView');
-const phoneView = document.getElementById('phoneView');
-const roomWord = document.getElementById('roomWord');
-const tvStatusEl = document.getElementById('tvStatus');
-const phoneSub = document.getElementById('phoneSub');
-const scanBar = document.getElementById('scanBar');
-const shareBtn = document.getElementById('shareBtn');
-const stopBtn = document.getElementById('stopBtn');
-const phoneStatus = document.getElementById('phoneStatus');
-const helpBox = document.getElementById('helpBox');
-const videoOverlay = document.getElementById('videoOverlay');
-const remoteVideo = document.getElementById('remoteVideo');
-
-let pc = null, localStream = null;
-let mqttTV = null, mqttPhone = null;
-let retryTimer = null;
-let room = '';
-
-const isPhone = window.innerWidth < 800 && 'ontouchstart' in window;
-
-function makeId() {
-  return 'm-' + Math.random().toString(36).slice(2, 10);
-}
-
-function connectMQTT() {
-  const client = new Paho.MQTT.Client(MQTT_HOST, MQTT_PORT, MQTT_PATH, makeId());
-  return new Promise((resolve, reject) => {
-    client.connect({
-      onSuccess: () => resolve(client),
-      onFailure: () => reject(new Error('Network error')),
-      timeout: 10, keepAliveInterval: 30, useSSL: true
-    });
+// Generate next 7 days
+const datesDiv = document.getElementById('dates');
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const today = new Date();
+for (let i = 0; i < 7; i++) {
+  const d = new Date(today);
+  d.setDate(today.getDate() + i);
+  const btn = document.createElement('div');
+  btn.className = 'date-btn';
+  btn.innerHTML = `<div class="day">${days[d.getDay()]}</div><div class="num">${d.getDate()}</div>`;
+  btn.dataset.date = d.toDateString();
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selected.date = d.toDateString();
+    checkReady();
   });
+  datesDiv.appendChild(btn);
 }
 
-// ─── Get local IP via WebRTC trick ──────────────────────────────
-async function getLocalIP() {
-  return new Promise((resolve) => {
-    const pc = new RTCPeerConnection(ice);
-    pc.createDataChannel('');
-    pc.createOffer().then(offer => pc.setLocalDescription(offer));
-    pc.onicecandidate = e => {
-      if (e.candidate) {
-        const ip = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
-        if (ip && !ip[1].startsWith('169.254')) {
-          pc.close();
-          resolve(ip[1]);
-        }
-      } else {
-        pc.close();
-        resolve(null);
-      }
-    };
-    setTimeout(() => { pc.close(); resolve(null); }, 3000);
+// Service selection
+document.querySelectorAll('.service-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selected.service = card.dataset;
+    checkReady();
   });
-}
-
-// ═══════════════ TV ═══════════════
-async function startTV() {
-  tvStatusEl.textContent = 'Detecting network...';
-  tvStatusEl.className = 'tv-status';
-
-  const ip = await getLocalIP();
-  if (!ip) {
-    tvStatusEl.textContent = 'Could not detect network. Refresh.';
-    tvStatusEl.className = 'tv-status error';
-    return;
-  }
-
-  room = ip.replace(/\./g, '-');
-  const lastOctet = ip.split('.').pop();
-  roomWord.textContent = lastOctet;
-  tvStatusEl.textContent = 'Waiting for iPhone...';
-
-  try {
-    mqttTV = await connectMQTT();
-    mqttTV.subscribe('mirror/' + room + '/phone');
-
-    let answered = false;
-    function sendOffer() {
-      if (!mqttTV || answered) return;
-      mqttTV.send('mirror/'+room+'/tv', JSON.stringify({
-        type:'offer', sdp:offer.sdp,
-        candidates: tvCandidates.map(c => ({
-          candidate:c.candidate, sdpMid:c.sdpMid, sdpMLineIndex:c.sdpMLineIndex
-        }))
-      }));
-    }
-
-    mqttTV.onMessageArrived = async (msg) => {
-      try {
-        const data = JSON.parse(msg.payloadString);
-        if (data.type === 'hello') { sendOffer(); }
-        else if (data.type === 'answer') {
-          answered = true;
-          if (retryTimer) { clearInterval(retryTimer); }
-          await pc.setRemoteDescription({ type:'answer', sdp:data.sdp });
-          data.candidates?.forEach(c => {
-            if (c.candidate) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});
-          });
-        } else if (data.type === 'ice' && data.candidate) {
-          pc.addIceCandidate(new RTCIceCandidate(data)).catch(()=>{});
-        }
-      } catch(e) {}
-    };
-
-    pc = new RTCPeerConnection(ice);
-    const tvCandidates = [];
-
-    pc.onicecandidate = e => {
-      if (e.candidate) {
-        tvCandidates.push(e.candidate);
-        mqttTV.send('mirror/'+room+'/tv', JSON.stringify({
-          type:'ice', candidate:e.candidate.candidate,
-          sdpMid:e.candidate.sdpMid, sdpMLineIndex:e.candidate.sdpMLineIndex
-        }));
-      }
-    };
-
-    pc.ontrack = event => {
-      remoteVideo.srcObject = event.streams[0];
-      videoOverlay.style.display = 'block';
-      tvStatusEl.textContent = 'Connected — showing screen';
-      tvStatusEl.className = 'tv-status ok';
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      const s = pc.iceConnectionState;
-      if (s === 'connected' || s === 'completed') {
-        tvStatusEl.textContent = 'Connected';
-        tvStatusEl.className = 'tv-status ok';
-      } else if (s === 'disconnected' || s === 'failed') {
-        tvStatusEl.textContent = 'Lost — refresh page';
-        tvStatusEl.className = 'tv-status error';
-        videoOverlay.style.display = 'none';
-        cleanupTV();
-      }
-    };
-
-    pc.createDataChannel('mirror');
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    await new Promise(r => setTimeout(r, 2000));
-    sendOffer();
-    retryTimer = setInterval(sendOffer, 3000);
-
-    setTimeout(() => {
-      if (pc && pc.iceConnectionState === 'new') { cleanupTV(); startTV(); }
-    }, 120000);
-
-  } catch(err) {
-    tvStatusEl.textContent = 'Error: ' + err.message;
-    tvStatusEl.className = 'tv-status error';
-  }
-}
-
-function cleanupTV() {
-  if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
-  if (pc) { pc.close(); pc = null; }
-  if (mqttTV) { try { mqttTV.disconnect(); } catch{} mqttTV = null; }
-}
-
-// ═══════════════ PHONE — auto-scan ─═════════════════════════════
-async function startPhone() {
-  phoneStatus.textContent = 'Detecting your network...';
-
-  const myIP = await getLocalIP();
-  if (!myIP) {
-    phoneStatus.textContent = 'Network error. Check Wi-Fi.';
-    phoneStatus.className = 'phone-status error';
-    return;
-  }
-
-  // Build list of possible TV IPs (same subnet, .1 through .254)
-  const parts = myIP.split('.');
-  const subnet = parts.slice(0, 3).join('.');
-  const candidates = [];
-  for (let i = 1; i <= 254; i++) {
-    if (parts[3] !== String(i)) { // skip own IP
-      candidates.push(subnet + '.' + i);
-    }
-  }
-
-  phoneSub.textContent = 'Scanning ' + candidates.length + ' addresses for your TV...';
-  phoneStatus.textContent = 'This takes a few seconds...';
-
-  // Scan in parallel batches of 10
-  const BATCH = 10;
-  let foundRoom = null;
-
-  for (let i = 0; i < candidates.length; i += BATCH) {
-    const batch = candidates.slice(i, i + BATCH);
-    const results = await Promise.all(batch.map(ip => tryConnect(ip)));
-
-    for (let j = 0; j < results.length; j++) {
-      if (results[j]) {
-        foundRoom = results[j];
-        break;
-      }
-    }
-
-    scanBar.style.width = Math.min(100, ((i + BATCH) / candidates.length) * 100) + '%';
-
-    if (foundRoom) break;
-  }
-
-  if (!foundRoom) {
-    phoneSub.textContent = 'TV not found on your network';
-    phoneStatus.textContent = 'Make sure both devices are on the same Wi-Fi and the TV page is open.';
-    phoneStatus.className = 'phone-status error';
-    scanBar.style.width = '100%';
-    scanBar.style.background = '#dc2626';
-    return;
-  }
-
-  // Found it!
-  room = foundRoom;
-  scanBar.style.width = '100%';
-  scanBar.style.background = '#4ade80';
-  phoneSub.textContent = 'TV found!';
-  phoneStatus.textContent = 'Connected! Tap Share Screen.';
-  phoneStatus.className = 'phone-status ok';
-
-  try {
-    mqttPhone = await connectMQTT();
-    mqttPhone.subscribe('mirror/' + room + '/tv');
-    mqttPhone.send('mirror/' + room + '/phone', JSON.stringify({type:'hello'}));
-
-    mqttPhone.onMessageArrived = async (msg) => {
-      try {
-        const data = JSON.parse(msg.payloadString);
-        if (!pc) return;
-        if (data.type === 'offer') {
-          await pc.setRemoteDescription({ type:'offer', sdp:data.sdp });
-          data.candidates?.forEach(c => {
-            if (c.candidate) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});
-          });
-          shareBtn.classList.remove('hidden');
-        } else if (data.type === 'ice' && data.candidate) {
-          pc.addIceCandidate(new RTCIceCandidate(data)).catch(()=>{});
-        }
-      } catch(e) {}
-    };
-
-    pc = new RTCPeerConnection(ice);
-    pc.onicecandidate = e => {
-      if (e.candidate && mqttPhone) {
-        mqttPhone.send('mirror/'+room+'/phone', JSON.stringify({
-          type:'ice', candidate:e.candidate.candidate,
-          sdpMid:e.candidate.sdpMid, sdpMLineIndex:e.candidate.sdpMLineIndex
-        }));
-      }
-    };
-    pc.oniceconnectionstatechange = () => {
-      if (pc.iceConnectionState === 'failed') {
-        phoneStatus.textContent = 'Connection lost';
-        phoneStatus.className = 'phone-status error';
-      }
-    };
-
-  } catch(err) {
-    phoneStatus.textContent = err.message;
-    phoneStatus.className = 'phone-status error';
-  }
-}
-
-async function tryConnect(ip) {
-  const roomName = ip.replace(/\./g, '-');
-  try {
-    const client = await new Promise((resolve, reject) => {
-      const c = new Paho.MQTT.Client(MQTT_HOST, MQTT_PORT, MQTT_PATH, makeId());
-      const timeout = setTimeout(() => { try { c.disconnect(); } catch{} reject('timeout'); }, 1500);
-      c.connect({
-        onSuccess: () => { clearTimeout(timeout); resolve(c); },
-        onFailure: () => { clearTimeout(timeout); reject('fail'); },
-        timeout: 5, keepAliveInterval: 10, useSSL: true
-      });
-    });
-
-    // Quick check: is TV in this room? Send hello and wait briefly for a response
-    let found = false;
-    client.subscribe('mirror/' + roomName + '/tv');
-    client.send('mirror/' + roomName + '/phone', JSON.stringify({type:'hello'}));
-
-    await new Promise((resolve) => {
-      client.onMessageArrived = () => { found = true; resolve(); };
-      setTimeout(resolve, 1000);
-    });
-
-    try { client.disconnect(); } catch{}
-
-    if (found) return roomName;
-  } catch(e) {}
-  return null;
-}
-
-// ─── Share / Stop ───────────────────────────────────────────────
-shareBtn.addEventListener('click', async () => {
-  shareBtn.disabled = true;
-  shareBtn.textContent = 'Tap "Start Broadcast"...';
-
-  try {
-    localStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: { ideal: 15 } }, audio: false
-    });
-
-    shareBtn.textContent = 'Connecting...';
-    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    await new Promise(r => setTimeout(r, 1500));
-
-    mqttPhone.send('mirror/'+room+'/phone', JSON.stringify({
-      type:'answer', sdp:answer.sdp, candidates:[]
-    }));
-
-    shareBtn.classList.add('hidden');
-    stopBtn.classList.remove('hidden');
-    phoneStatus.textContent = 'Sharing to TV';
-    phoneStatus.className = 'phone-status ok';
-    localStream.getVideoTracks()[0].onended = () => stopPhone(true);
-
-  } catch(err) {
-    shareBtn.disabled = false;
-    shareBtn.textContent = 'Share Screen';
-    phoneStatus.textContent = 'Error: ' + (err.message || err.name);
-    phoneStatus.className = 'phone-status error';
-
-    helpBox.innerHTML = `
-      <div class="help-box">
-        <p><strong>Screen sharing not available.</strong></p>
-        <p>iOS Safari may block this. ${err.name}: ${err.message || ''}</p>
-      </div>`;
-  }
 });
 
-stopBtn.addEventListener('click', () => stopPhone(false));
+// Time selection
+document.querySelectorAll('.time-slot').forEach(slot => {
+  slot.addEventListener('click', () => {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    slot.classList.add('selected');
+    selected.time = slot.textContent;
+    checkReady();
+  });
+});
 
-function stopPhone(systemStop) {
-  if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-  if (pc) { pc.close(); pc = null; }
-  if (mqttPhone) { try { mqttPhone.disconnect(); } catch{} mqttPhone = null; }
-  stopBtn.classList.add('hidden');
-  shareBtn.classList.remove('hidden');
-  shareBtn.textContent = 'Share Screen';
-  shareBtn.disabled = false;
-  phoneStatus.textContent = systemStop ? 'Sharing stopped' : 'Stopped';
-  phoneStatus.className = 'phone-status';
+function checkReady() {
+  const btn = document.getElementById('bookBtn');
+  const name = document.getElementById('name').value.trim();
+  if (name && selected.service && selected.date && selected.time) {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
+  }
 }
 
-// ═══════════════ GO ═══════════════
-if (isPhone) {
-  phoneView.classList.remove('hidden');
-  startPhone();
-} else {
-  tvView.classList.remove('hidden');
-  startTV();
-}
+document.getElementById('name').addEventListener('input', checkReady);
+
+document.getElementById('bookBtn').addEventListener('click', () => {
+  const name = document.getElementById('name').value.trim();
+  document.getElementById('confirmDetail').innerHTML =
+    `<strong>${name}</strong><br>
+     ${selected.service.name} · ${selected.service.price} kr<br>
+     ${selected.date} at ${selected.time}<br>
+     Duration: ${selected.service.dur}`;
+  document.getElementById('confirmBox').style.display = 'block';
+  document.getElementById('bookBtn').style.display = 'none';
+  document.getElementById('confirmBox').scrollIntoView({ behavior: 'smooth' });
+});
 </script>
+
 </body>
 </html>
