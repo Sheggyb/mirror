@@ -9,33 +9,22 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #000;
-    color: #fff;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #000; color: #fff;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
   }
   .hidden { display: none !important; }
 
   #tvView { text-align: center; padding: 5vh 5vw; width: 100%; }
   #tvView .room-word {
-    font-size: min(22vw, 14rem);
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    color: #4f46e5;
-    line-height: 1;
+    font-size: min(22vw, 14rem); font-weight: 900;
+    letter-spacing: 0.15em; color: #4f46e5; line-height: 1;
   }
   #tvView .room-hint {
-    font-size: min(4vw, 1.5rem);
-    color: #555;
-    margin-top: 3vh;
+    font-size: min(4vw, 1.5rem); color: #555; margin-top: 3vh;
   }
   #tvView .tv-status {
-    font-size: min(3vw, 1.2rem);
-    color: #555;
-    margin-top: 3vh;
+    font-size: min(3vw, 1.2rem); color: #555; margin-top: 3vh;
   }
   #tvView .tv-status.ok { color: #4ade80; }
   #tvView .tv-status.error { color: #f87171; }
@@ -43,24 +32,13 @@
   #phoneView { width: 100%; max-width: 400px; padding: 24px; text-align: center; }
   #phoneView h1 { font-size: 1.5rem; margin-bottom: 4px; }
   #phoneView .sub { color: #999; font-size: 0.85rem; margin-bottom: 24px; }
-
-  #phoneView .code-input {
-    width: 100%; padding: 18px;
-    background: #1a1a2e; border: 2px solid #333; border-radius: 14px;
-    color: #fff; font-size: 1.6rem; text-align: center;
-    text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    outline: none; margin-bottom: 16px;
-  }
-  #phoneView .code-input:focus { border-color: #4f46e5; }
-
   #phoneView .big-btn {
-    display: block; width: 100%; padding: 20px; border: none; border-radius: 14px;
-    font-size: 1.2rem; font-weight: 700; cursor: pointer; color: #fff;
+    display: block; width: 100%; padding: 20px; border: none;
+    border-radius: 14px; font-size: 1.2rem; font-weight: 700;
+    cursor: pointer; color: #fff; background: #4f46e5;
   }
   #phoneView .big-btn:active { opacity: 0.7; }
   #phoneView .big-btn:disabled { opacity: 0.4; }
-  #phoneView .big-btn.connect { background: #4f46e5; }
   #phoneView .big-btn.share { background: #059669; }
   #phoneView .big-btn.stop { background: #dc2626; }
 
@@ -70,13 +48,20 @@
   #phoneView .phone-status.error { color: #f87171; }
   #phoneView .phone-status.ok { color: #4ade80; }
 
+  #phoneView .scan-progress {
+    width: 100%; height: 4px; background: #222; border-radius: 2px;
+    margin-top: 16px; overflow: hidden;
+  }
+  #phoneView .scan-bar {
+    height: 100%; background: #4f46e5;
+    transition: width 0.3s; width: 0%;
+  }
+
   #videoOverlay {
     position: fixed; inset: 0; background: #000;
     display: none; z-index: 100;
   }
-  #videoOverlay video {
-    width: 100%; height: 100%; object-fit: contain;
-  }
+  #videoOverlay video { width: 100%; height: 100%; object-fit: contain; }
 
   .help-box {
     background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px;
@@ -84,26 +69,23 @@
   }
   .help-box p { color: #ccc; margin-bottom: 6px; }
   .help-box strong { color: #f87171; }
-  .help-box ol { margin: 4px 0 0 18px; color: #ccc; }
-  .help-box ol li { margin-bottom: 4px; }
 </style>
 </head>
 <body>
 
 <div id="tvView" class="hidden">
-  <div class="room-word" id="roomWord">----</div>
-  <div class="room-hint">📺 TV — On your iPhone, open this page<br>and type the code</div>
+  <div class="room-word" id="roomWord">....</div>
+  <div class="room-hint">📺 TV — iPhone should find this automatically<br>or type this number on your phone</div>
   <div class="tv-status" id="tvStatus">Setting up...</div>
 </div>
 
 <div id="phoneView" class="hidden">
-  <h1>Screen Mirror 📱</h1>
-  <p class="sub">Type the code from your TV</p>
-  <input class="code-input" id="codeInput" type="text" maxlength="4" placeholder="4-letter code" autocomplete="off" autocorrect="off" autocapitalize="characters">
-  <button class="big-btn connect" id="connectBtn">Connect to TV</button>
-  <button class="big-btn share hidden" id="shareBtn">Share Screen</button>
+  <h1>📱 Screen Mirror</h1>
+  <p class="sub" id="phoneSub">Scanning your network for the TV...</p>
+  <div class="scan-progress"><div class="scan-bar" id="scanBar"></div></div>
+  <button class="big-btn hidden" id="shareBtn">Share Screen</button>
   <button class="big-btn stop hidden" id="stopBtn">Stop Sharing</button>
-  <div class="phone-status" id="phoneStatus">Enter the 4-letter code on your TV</div>
+  <div class="phone-status" id="phoneStatus"></div>
   <div id="helpBox"></div>
 </div>
 
@@ -111,45 +93,29 @@
   <video id="remoteVideo" autoplay playsinline></video>
 </div>
 
-<!-- Diagnostic (shows on phone only when there's a problem) -->
-<div id="diagBox" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:12px;z-index:200;max-height:40vh;overflow-y:auto;border-top:1px solid #333;"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
 <script>
 const MQTT_HOST = 'broker.emqx.io';
 const MQTT_PORT = 8084;
 const MQTT_PATH = '/mqtt';
 
-const WORDS = [
-  'BLUE','FROG','STAR','MOON','WAVE','FIRE','SNOW','LEAF','ROCK','BIRD',
-  'FISH','TREE','WIND','GOLD','LAKE','SAND','DEER','WOLF','BEAR','LION',
-  'HAWK','DUCK','SWAN','RAIN','ROSE','LILY','CAVE','HILL','DUNE','REEF',
-  'MIST','DAWN','DUSK','GLEN','PINE','COVE','CAPE','MESA','POND','FERN',
-  'MOSS','VINE','SEED','DRUM','BELL','HORN','HARP','LYRE','DOME','ARCH',
-  'TOWER','WALL','GATE','PIER','DOCK','PORT','SHIP','BOAT','RAFT','SAIL',
-  'PATH','ROAD','LANE','FORD','PASS','PEAK','VALE','DELL','IRON','ZINC',
-  'COAL','JADE','RUBY','OPAL','ONYX','PEAR','DESK','LAMP','BOOK','DOOR',
-  'BARN','CART','FARM','MILL','BANK','SHOP','PARK','YARD','BATH','FOOD',
-  'CAKE','MILK','SALT','RICE','SOUP','MEAT','BREAD','CHEF','COOK','OVEN'
-];
-
 const ice = { iceServers: [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' }
 ]};
 
-const tvView      = document.getElementById('tvView');
-const phoneView   = document.getElementById('phoneView');
-const roomWord    = document.getElementById('roomWord');
-const tvStatusEl  = document.getElementById('tvStatus');
-const codeInput   = document.getElementById('codeInput');
-const connectBtn  = document.getElementById('connectBtn');
-const shareBtn    = document.getElementById('shareBtn');
-const stopBtn     = document.getElementById('stopBtn');
+const tvView = document.getElementById('tvView');
+const phoneView = document.getElementById('phoneView');
+const roomWord = document.getElementById('roomWord');
+const tvStatusEl = document.getElementById('tvStatus');
+const phoneSub = document.getElementById('phoneSub');
+const scanBar = document.getElementById('scanBar');
+const shareBtn = document.getElementById('shareBtn');
+const stopBtn = document.getElementById('stopBtn');
 const phoneStatus = document.getElementById('phoneStatus');
-const helpBox     = document.getElementById('helpBox');
+const helpBox = document.getElementById('helpBox');
 const videoOverlay = document.getElementById('videoOverlay');
-const remoteVideo  = document.getElementById('remoteVideo');
+const remoteVideo = document.getElementById('remoteVideo');
 
 let pc = null, localStream = null;
 let mqttTV = null, mqttPhone = null;
@@ -157,10 +123,6 @@ let retryTimer = null;
 let room = '';
 
 const isPhone = window.innerWidth < 800 && 'ontouchstart' in window;
-
-function randomWord() {
-  return WORDS[Math.floor(Math.random() * WORDS.length)];
-}
 
 function makeId() {
   return 'm-' + Math.random().toString(36).slice(2, 10);
@@ -171,25 +133,56 @@ function connectMQTT() {
   return new Promise((resolve, reject) => {
     client.connect({
       onSuccess: () => resolve(client),
-      onFailure: () => reject(new Error('Signaling failed. Check your internet.')),
+      onFailure: () => reject(new Error('Network error')),
       timeout: 10, keepAliveInterval: 30, useSSL: true
     });
   });
 }
 
+// ─── Get local IP via WebRTC trick ──────────────────────────────
+async function getLocalIP() {
+  return new Promise((resolve) => {
+    const pc = new RTCPeerConnection(ice);
+    pc.createDataChannel('');
+    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+    pc.onicecandidate = e => {
+      if (e.candidate) {
+        const ip = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+        if (ip && !ip[1].startsWith('169.254')) {
+          pc.close();
+          resolve(ip[1]);
+        }
+      } else {
+        pc.close();
+        resolve(null);
+      }
+    };
+    setTimeout(() => { pc.close(); resolve(null); }, 3000);
+  });
+}
+
 // ═══════════════ TV ═══════════════
 async function startTV() {
-  room = randomWord();
-  roomWord.textContent = room;
-  tvStatusEl.textContent = 'Setting up...';
+  tvStatusEl.textContent = 'Detecting network...';
   tvStatusEl.className = 'tv-status';
+
+  const ip = await getLocalIP();
+  if (!ip) {
+    tvStatusEl.textContent = 'Could not detect network. Refresh.';
+    tvStatusEl.className = 'tv-status error';
+    return;
+  }
+
+  room = ip.replace(/\./g, '-');
+  const lastOctet = ip.split('.').pop();
+  roomWord.textContent = lastOctet;
+  tvStatusEl.textContent = 'Waiting for iPhone...';
 
   try {
     mqttTV = await connectMQTT();
     mqttTV.subscribe('mirror/' + room + '/phone');
 
     let answered = false;
-
     function sendOffer() {
       if (!mqttTV || answered) return;
       mqttTV.send('mirror/'+room+'/tv', JSON.stringify({
@@ -203,14 +196,11 @@ async function startTV() {
     mqttTV.onMessageArrived = async (msg) => {
       try {
         const data = JSON.parse(msg.payloadString);
-        if (data.type === 'hello') {
-          // Phone just joined — re-send offer immediately
-          tvStatusEl.textContent = 'iPhone connected — sending...';
-          sendOffer();
-        } else if (data.type === 'answer') {
+        if (data.type === 'hello') { sendOffer(); }
+        else if (data.type === 'answer') {
           answered = true;
-          if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
-          await pc.setRemoteDescription({ type: 'answer', sdp: data.sdp });
+          if (retryTimer) { clearInterval(retryTimer); }
+          await pc.setRemoteDescription({ type:'answer', sdp:data.sdp });
           data.candidates?.forEach(c => {
             if (c.candidate) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});
           });
@@ -246,7 +236,7 @@ async function startTV() {
         tvStatusEl.textContent = 'Connected';
         tvStatusEl.className = 'tv-status ok';
       } else if (s === 'disconnected' || s === 'failed') {
-        tvStatusEl.textContent = 'Lost connection — refresh page';
+        tvStatusEl.textContent = 'Lost — refresh page';
         tvStatusEl.className = 'tv-status error';
         videoOverlay.style.display = 'none';
         cleanupTV();
@@ -257,12 +247,8 @@ async function startTV() {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     await new Promise(r => setTimeout(r, 2000));
-
     sendOffer();
-    // Re-send offer every 3 seconds until phone answers
     retryTimer = setInterval(sendOffer, 3000);
-
-    tvStatusEl.textContent = 'Waiting for iPhone...';
 
     setTimeout(() => {
       if (pc && pc.iceConnectionState === 'new') { cleanupTV(); startTV(); }
@@ -280,27 +266,70 @@ function cleanupTV() {
   if (mqttTV) { try { mqttTV.disconnect(); } catch{} mqttTV = null; }
 }
 
-// ═══════════════ PHONE ═══════════════
-connectBtn.addEventListener('click', async () => {
-  const code = codeInput.value.trim().toUpperCase();
-  if (code.length !== 4) {
-    phoneStatus.textContent = 'Enter the 4-letter code from your TV';
+// ═══════════════ PHONE — auto-scan ─═════════════════════════════
+async function startPhone() {
+  phoneStatus.textContent = 'Detecting your network...';
+
+  const myIP = await getLocalIP();
+  if (!myIP) {
+    phoneStatus.textContent = 'Network error. Check Wi-Fi.';
     phoneStatus.className = 'phone-status error';
     return;
   }
-  room = code;
 
-  connectBtn.disabled = true;
-  connectBtn.textContent = 'Connecting...';
-  phoneStatus.textContent = 'Looking for TV...';
-  phoneStatus.className = 'phone-status';
-  helpBox.innerHTML = '';
+  // Build list of possible TV IPs (same subnet, .1 through .254)
+  const parts = myIP.split('.');
+  const subnet = parts.slice(0, 3).join('.');
+  const candidates = [];
+  for (let i = 1; i <= 254; i++) {
+    if (parts[3] !== String(i)) { // skip own IP
+      candidates.push(subnet + '.' + i);
+    }
+  }
+
+  phoneSub.textContent = 'Scanning ' + candidates.length + ' addresses for your TV...';
+  phoneStatus.textContent = 'This takes a few seconds...';
+
+  // Scan in parallel batches of 10
+  const BATCH = 10;
+  let foundRoom = null;
+
+  for (let i = 0; i < candidates.length; i += BATCH) {
+    const batch = candidates.slice(i, i + BATCH);
+    const results = await Promise.all(batch.map(ip => tryConnect(ip)));
+
+    for (let j = 0; j < results.length; j++) {
+      if (results[j]) {
+        foundRoom = results[j];
+        break;
+      }
+    }
+
+    scanBar.style.width = Math.min(100, ((i + BATCH) / candidates.length) * 100) + '%';
+
+    if (foundRoom) break;
+  }
+
+  if (!foundRoom) {
+    phoneSub.textContent = 'TV not found on your network';
+    phoneStatus.textContent = 'Make sure both devices are on the same Wi-Fi and the TV page is open.';
+    phoneStatus.className = 'phone-status error';
+    scanBar.style.width = '100%';
+    scanBar.style.background = '#dc2626';
+    return;
+  }
+
+  // Found it!
+  room = foundRoom;
+  scanBar.style.width = '100%';
+  scanBar.style.background = '#4ade80';
+  phoneSub.textContent = 'TV found!';
+  phoneStatus.textContent = 'Connected! Tap Share Screen.';
+  phoneStatus.className = 'phone-status ok';
 
   try {
     mqttPhone = await connectMQTT();
     mqttPhone.subscribe('mirror/' + room + '/tv');
-
-    // Tell the TV we're here — triggers immediate offer re-send
     mqttPhone.send('mirror/' + room + '/phone', JSON.stringify({type:'hello'}));
 
     mqttPhone.onMessageArrived = async (msg) => {
@@ -312,11 +341,7 @@ connectBtn.addEventListener('click', async () => {
           data.candidates?.forEach(c => {
             if (c.candidate) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});
           });
-          connectBtn.classList.add('hidden');
-          codeInput.classList.add('hidden');
           shareBtn.classList.remove('hidden');
-          phoneStatus.textContent = 'Connected! Tap Share Screen.';
-          phoneStatus.className = 'phone-status ok';
         } else if (data.type === 'ice' && data.candidate) {
           pc.addIceCandidate(new RTCIceCandidate(data)).catch(()=>{});
         }
@@ -324,7 +349,6 @@ connectBtn.addEventListener('click', async () => {
     };
 
     pc = new RTCPeerConnection(ice);
-
     pc.onicecandidate = e => {
       if (e.candidate && mqttPhone) {
         mqttPhone.send('mirror/'+room+'/phone', JSON.stringify({
@@ -333,7 +357,6 @@ connectBtn.addEventListener('click', async () => {
         }));
       }
     };
-
     pc.oniceconnectionstatechange = () => {
       if (pc.iceConnectionState === 'failed') {
         phoneStatus.textContent = 'Connection lost';
@@ -342,21 +365,49 @@ connectBtn.addEventListener('click', async () => {
     };
 
   } catch(err) {
-    connectBtn.disabled = false;
-    connectBtn.textContent = 'Connect to TV';
     phoneStatus.textContent = err.message;
     phoneStatus.className = 'phone-status error';
   }
-});
+}
 
+async function tryConnect(ip) {
+  const roomName = ip.replace(/\./g, '-');
+  try {
+    const client = await new Promise((resolve, reject) => {
+      const c = new Paho.MQTT.Client(MQTT_HOST, MQTT_PORT, MQTT_PATH, makeId());
+      const timeout = setTimeout(() => { try { c.disconnect(); } catch{} reject('timeout'); }, 1500);
+      c.connect({
+        onSuccess: () => { clearTimeout(timeout); resolve(c); },
+        onFailure: () => { clearTimeout(timeout); reject('fail'); },
+        timeout: 5, keepAliveInterval: 10, useSSL: true
+      });
+    });
+
+    // Quick check: is TV in this room? Send hello and wait briefly for a response
+    let found = false;
+    client.subscribe('mirror/' + roomName + '/tv');
+    client.send('mirror/' + roomName + '/phone', JSON.stringify({type:'hello'}));
+
+    await new Promise((resolve) => {
+      client.onMessageArrived = () => { found = true; resolve(); };
+      setTimeout(resolve, 1000);
+    });
+
+    try { client.disconnect(); } catch{}
+
+    if (found) return roomName;
+  } catch(e) {}
+  return null;
+}
+
+// ─── Share / Stop ───────────────────────────────────────────────
 shareBtn.addEventListener('click', async () => {
   shareBtn.disabled = true;
   shareBtn.textContent = 'Tap "Start Broadcast"...';
 
   try {
     localStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: { ideal: 15 } },
-      audio: false
+      video: { frameRate: { ideal: 15 } }, audio: false
     });
 
     shareBtn.textContent = 'Connecting...';
@@ -374,21 +425,18 @@ shareBtn.addEventListener('click', async () => {
     stopBtn.classList.remove('hidden');
     phoneStatus.textContent = 'Sharing to TV';
     phoneStatus.className = 'phone-status ok';
-
     localStream.getVideoTracks()[0].onended = () => stopPhone(true);
 
   } catch(err) {
     shareBtn.disabled = false;
     shareBtn.textContent = 'Share Screen';
-
-    phoneStatus.textContent = 'Error: ' + (err.message || err.name || 'Unknown');
+    phoneStatus.textContent = 'Error: ' + (err.message || err.name);
     phoneStatus.className = 'phone-status error';
 
     helpBox.innerHTML = `
       <div class="help-box">
-        <p><strong>Screen share failed.</strong></p>
-        <p style="color:#f87171;">${err.name}: ${err.message || ''}</p>
-        <p style="margin-top:10px;font-size:0.8rem;color:#666;">iOS ${(/OS (\d+_\d+)/.exec(navigator.userAgent)||['','?'])[1]?.replace(/_/g,'.') || '?'} | ${/Safari/.test(navigator.userAgent)&&!/CriOS|FxiOS/.test(navigator.userAgent)?'Safari':navigator.userAgent.includes('CriOS')?'Chrome':'Other'}</p>
+        <p><strong>Screen sharing not available.</strong></p>
+        <p>iOS Safari may block this. ${err.name}: ${err.message || ''}</p>
       </div>`;
   }
 });
@@ -400,31 +448,17 @@ function stopPhone(systemStop) {
   if (pc) { pc.close(); pc = null; }
   if (mqttPhone) { try { mqttPhone.disconnect(); } catch{} mqttPhone = null; }
   stopBtn.classList.add('hidden');
-  shareBtn.classList.add('hidden');
-  connectBtn.classList.remove('hidden');
-  codeInput.classList.remove('hidden');
-  connectBtn.disabled = false;
-  connectBtn.textContent = 'Connect to TV';
+  shareBtn.classList.remove('hidden');
+  shareBtn.textContent = 'Share Screen';
+  shareBtn.disabled = false;
   phoneStatus.textContent = systemStop ? 'Sharing stopped' : 'Stopped';
   phoneStatus.className = 'phone-status';
-  codeInput.value = '';
 }
 
 // ═══════════════ GO ═══════════════
 if (isPhone) {
   phoneView.classList.remove('hidden');
-  // Show diagnostic
-  const diag = document.getElementById('diagBox');
-  const md = navigator.mediaDevices;
-  const ua = navigator.userAgent;
-  const gdm = md && md.getDisplayMedia;
-  diag.style.display = 'block';
-  diag.innerHTML =
-    'mediaDevices: ' + (md ? 'YES' : 'NO') + '<br>' +
-    'getDisplayMedia: ' + (gdm ? 'YES (typeof=' + typeof gdm + ')' : 'MISSING') + '<br>' +
-    'isSecureContext: ' + (window.isSecureContext ? 'YES' : 'NO') + '<br>' +
-    'window.safari: ' + (window.safari ? 'YES' : 'NO') + '<br>' +
-    'UA: ' + ua.substring(0, 100);
+  startPhone();
 } else {
   tvView.classList.remove('hidden');
   startTV();
