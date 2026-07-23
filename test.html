@@ -1,33 +1,34 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Test</title></head>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Screen Test</title></head>
 <body style="background:#000;color:#fff;font-family:monospace;padding:20px;font-size:14px;">
-<h2>Screen Capture Test</h2>
+<h1 id="label">Detecting device...</h1>
 <div id="out"></div>
 <button id="btn" style="padding:16px 32px;font-size:18px;margin-top:16px;">Test getDisplayMedia</button>
 <script>
 const out = document.getElementById('out');
 const btn = document.getElementById('btn');
+const label = document.getElementById('label');
+
+const isPhone = window.innerWidth < 800 && 'ontouchstart' in window;
+label.textContent = isPhone ? 'THIS IS YOUR PHONE' : 'THIS IS YOUR TV';
+label.style.color = isPhone ? '#4ade80' : '#f87171';
 
 const md = navigator.mediaDevices;
 const gdm = md ? md.getDisplayMedia : undefined;
 const ua = navigator.userAgent;
 
 let html = '';
+html += 'Screen: ' + screen.width + 'x' + screen.height + '<br>';
+html += 'Window: ' + window.innerWidth + 'x' + window.innerHeight + '<br>';
+html += 'Touch: ' + ('ontouchstart' in window ? 'YES' : 'NO') + '<br>';
 html += 'navigator.mediaDevices: ' + (md ? 'YES' : 'NO') + '<br>';
 html += 'getDisplayMedia: ' + (gdm ? 'YES (typeof=' + typeof gdm + ')' : 'MISSING') + '<br>';
 html += 'isSecureContext: ' + (window.isSecureContext ? 'YES' : 'NO') + '<br>';
-html += 'window.safari: ' + (window.safari ? 'YES' : 'NO') + '<br>';
-html += 'navigator.maxTouchPoints: ' + navigator.maxTouchPoints + '<br>';
-html += 'screen width: ' + screen.width + '<br>';
-html += 'UA: ' + ua + '<br>';
-html += 'UA length: ' + ua.length + '<br>';
+html += 'window.safari: ' + (typeof window.safari !== 'undefined' ? 'YES' : 'NO') + '<br>';
+html += 'UA: ' + ua.substring(0, 120) + '<br>';
 
-// List all keys on navigator.mediaDevices
 if (md) {
-  html += '<br>mediaDevices keys: ' + JSON.stringify(Object.keys(md)) + '<br>';
-  html += 'mediaDevices own properties: ' + JSON.stringify(Object.getOwnPropertyNames(md)) + '<br>';
-  // Check prototype
-  html += 'proto keys: ' + JSON.stringify(Object.keys(Object.getPrototypeOf(md))) + '<br>';
+  html += '<br>mediaDevices methods: ' + JSON.stringify(Object.keys(Object.getPrototypeOf(md))) + '<br>';
 }
 
 out.innerHTML = html;
@@ -39,12 +40,12 @@ btn.addEventListener('click', async () => {
     const stream = await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
     btn.textContent = 'WORKS!';
     btn.style.background = 'green';
-    out.innerHTML += '<br><b style="color:green">SUCCESS! getDisplayMedia works.</b>';
+    out.innerHTML += '<br><b style="color:green">SUCCESS! getDisplayMedia works!</b>';
     stream.getTracks().forEach(t => t.stop());
   } catch(e) {
     btn.textContent = 'FAILED: ' + e.name;
     btn.style.background = 'red';
-    out.innerHTML += '<br><b style="color:red">Error: ' + e.name + ' — ' + e.message + '</b>';
+    out.innerHTML += '<br><b style="color:red">' + e.name + ': ' + e.message + '</b>';
     btn.disabled = false;
   }
 });
