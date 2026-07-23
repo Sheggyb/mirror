@@ -110,6 +110,9 @@
   <video id="remoteVideo" autoplay playsinline></video>
 </div>
 
+<!-- Diagnostic (shows on phone only when there's a problem) -->
+<div id="diagBox" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:12px;z-index:200;max-height:40vh;overflow-y:auto;border-top:1px solid #333;"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
 <script>
 const MQTT_HOST = 'broker.emqx.io';
@@ -409,6 +412,18 @@ function stopPhone(systemStop) {
 // ═══════════════ GO ═══════════════
 if (isPhone) {
   phoneView.classList.remove('hidden');
+  // Show diagnostic
+  const diag = document.getElementById('diagBox');
+  const md = navigator.mediaDevices;
+  const ua = navigator.userAgent;
+  const gdm = md && md.getDisplayMedia;
+  diag.style.display = 'block';
+  diag.innerHTML =
+    'mediaDevices: ' + (md ? 'YES' : 'NO') + '<br>' +
+    'getDisplayMedia: ' + (gdm ? 'YES (typeof=' + typeof gdm + ')' : 'MISSING') + '<br>' +
+    'isSecureContext: ' + (window.isSecureContext ? 'YES' : 'NO') + '<br>' +
+    'window.safari: ' + (window.safari ? 'YES' : 'NO') + '<br>' +
+    'UA: ' + ua.substring(0, 100);
 } else {
   tvView.classList.remove('hidden');
   startTV();
