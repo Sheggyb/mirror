@@ -346,6 +346,25 @@ connectBtn.addEventListener('click', async () => {
 });
 
 shareBtn.addEventListener('click', async () => {
+  // Check if screen sharing is actually available
+  if (!navigator.mediaDevices || typeof navigator.mediaDevices.getDisplayMedia !== 'function') {
+    phoneStatus.textContent = 'Screen sharing not available';
+    phoneStatus.className = 'phone-status error';
+    const ua = navigator.userAgent;
+    const iosVer = (/OS (\d+_\d+)/.exec(ua)||['','?'])[1].replace(/_/g,'.');
+    helpBox.innerHTML = `
+      <div class="help-box">
+        <p><strong>Your browser doesn't support screen sharing.</strong></p>
+        <p>iOS version: ${iosVer} — requires <strong>iOS 16.4 or newer</strong>.</p>
+        <p style="margin-top:8px;">Also make sure:</p>
+        <ol>
+          <li>You opened this page directly in the <strong>Safari app</strong> (not from a link in another app)</li>
+          <li>The URL starts with <strong>https://</strong></li>
+        </ol>
+      </div>`;
+    return;
+  }
+
   shareBtn.disabled = true;
   shareBtn.textContent = 'Tap "Start Broadcast"...';
 
@@ -378,50 +397,11 @@ shareBtn.addEventListener('click', async () => {
     shareBtn.textContent = 'Share Screen';
 
     if (err.name === 'NotAllowedError') {
-      phoneStatus.textContent = 'Permission denied — try again';
+      phoneStatus.textContent = 'Permission denied — try again and tap "Start Broadcast"';
       phoneStatus.className = 'phone-status error';
     } else if (err.name === 'AbortError') {
       phoneStatus.textContent = 'Cancelled';
       phoneStatus.className = 'phone-status error';
-    } else if (err.message?.includes('getDisplayMedia') || err.name === 'TypeError') {
-      // Screen sharing not available — show help
-      phoneStatus.textContent = 'Screen sharing not available in this browser';
-      phoneStatus.className = 'phone-status error';
-      const ua = navigator.userAgent;
-      const isIOS = /iPhone|iPad|iPod/.test(ua);
-      const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS/.test(ua);
-      const iosVer = (/OS (\d+_\d+)/.exec(ua)||['','?'])[1].replace('_','.');
-
-      if (isIOS && isSafari) {
-        // Real Safari, but getDisplayMedia still failed — probably in-app browser
-        helpBox.innerHTML = `
-          <div class="help-box">
-            <p><strong>You might be in an in-app browser.</strong></p>
-            <p>Some apps open links in a limited browser that blocks screen sharing.</p>
-            <p style="margin-top:8px;">Try this:</p>
-            <ol>
-              <li>Tap the address bar at the bottom</li>
-              <li>Tap the <strong>AA</strong> or share icon</li>
-              <li>Tap <strong>"Open in Safari"</strong></li>
-            </ol>
-            <p style="margin-top:8px;">Or: copy this URL, open the Safari app, and paste it:</p>
-            <p style="color:#4f46e5;word-break:break-all;">sheggyb.github.io/mirror</p>
-          </div>`;
-      } else if (isIOS) {
-        helpBox.innerHTML = `
-          <div class="help-box">
-            <p><strong>Screen sharing only works in Safari on iOS.</strong></p>
-            <p>You're using ${ua.includes('CriOS')?'Chrome':ua.includes('FxiOS')?'Firefox':'another browser'}.</p>
-            <p style="margin-top:8px;">Copy this URL and open it in the <strong>Safari</strong> app:</p>
-            <p style="color:#4f46e5;word-break:break-all;">sheggyb.github.io/mirror</p>
-          </div>`;
-      } else {
-        helpBox.innerHTML = `
-          <div class="help-box">
-            <p><strong>Screen sharing not supported on this device.</strong></p>
-            <p>This feature requires a modern browser with screen capture support (iOS 16.4+ Safari, or desktop Chrome/Edge).</p>
-          </div>`;
-      }
     } else {
       phoneStatus.textContent = 'Error: ' + err.message;
       phoneStatus.className = 'phone-status error';
