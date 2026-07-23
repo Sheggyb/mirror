@@ -2,183 +2,316 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Snake</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron Forge — Training & Nutrition</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0a0a0f; display: flex; align-items: center;
-    justify-content: center; height: 100vh; height: 100dvh;
-    font-family: 'Courier New', monospace; overflow: hidden;
-    touch-action: none; user-select: none;
-  }
-  .wrap { text-align: center; }
-  .score {
-    color: #3a3a4a; font-size: min(2vw, 0.85rem); letter-spacing: 4px;
-    text-transform: uppercase; margin-bottom: 12px;
-  }
-  .score span { color: #6ee7b7; font-size: min(3vw, 1.3rem); }
-  canvas {
-    border: 1px solid #1a1a2e; border-radius: 4px;
-    display: block; margin: 0 auto;
-  }
-  .controls {
-    display: grid; margin-top: 16px;
-    grid-template-areas: '. up .' 'left . right' '. down .';
-    grid-template-columns: repeat(3, min(12vw, 80px));
-    grid-template-rows: repeat(3, min(12vw, 80px)); gap: 6px;
-    justify-content: center;
-  }
-  .ctrl {
-    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px;
-    font-size: min(5vw, 2rem); color: #6ee7b7; display: flex;
-    align-items: center; justify-content: center; cursor: pointer;
-    -webkit-tap-highlight-color: transparent; min-width: 48px; min-height: 48px;
-  }
-  .ctrl:active, .ctrl:focus { background: #2a2a4a; }
-  .up { grid-area: up; } .down { grid-area: down; }
-  .left { grid-area: left; } .right { grid-area: right; }
-
-  .gameover {
-    display: none; color: #6ee7b7; font-size: min(3vw, 1.3rem); margin-top: 16px;
-    letter-spacing: 3px;
-  }
-  .gameover button {
-    display: block; margin: 14px auto 0; padding: min(2vh, 14px) min(6vw, 36px);
-    background: #6ee7b7; color: #0a0a0f; border: none; border-radius: 8px;
-    font-size: min(2.5vw, 1rem); font-weight: 700; letter-spacing: 2px;
-    cursor: pointer; text-transform: uppercase;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0c0c14; color: #c8c8d4; line-height: 1.6;
   }
 
-  .hint {
-    color: #2a2a4a; font-size: min(1.5vw, 0.7rem); margin-top: 10px;
-    letter-spacing: 2px;
+  .hero {
+    background: linear-gradient(160deg, #1a1428 0%, #0e0c1a 60%, #0a0a14 100%);
+    text-align: center; padding: 56px 20px 44px;
+    border-bottom: 1px solid #1e1b2e;
   }
+  .hero .brand {
+    font-size: 0.65rem; letter-spacing: 6px; text-transform: uppercase;
+    color: #6b5e7a; margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 2.8rem; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: #e0d8f0;
+  }
+  .hero h1 span { color: #a78bfa; }
+  .hero p { color: #6b5e7a; font-size: 0.8rem; letter-spacing: 4px; margin-top: 8px; }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; margin: 32px 0 0;
+    border-bottom: 1px solid #1e1b2e;
+  }
+  .tab {
+    flex: 1; padding: 12px 0; text-align: center; cursor: pointer;
+    font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;
+    color: #4a3f5c; border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab.active { color: #a78bfa; border-bottom-color: #a78bfa; }
+
+  /* Day selector */
+  .days {
+    display: flex; gap: 6px; margin: 24px 0; overflow-x: auto; padding-bottom: 4px;
+  }
+  .day-btn {
+    flex: 0 0 auto; padding: 10px 14px; background: #12121e;
+    border: 1px solid #1e1b2e; border-radius: 8px; cursor: pointer;
+    font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+    color: #6b5e7a; transition: all 0.2s;
+  }
+  .day-btn.active { border-color: #a78bfa; color: #a78bfa; background: #16132a; }
+
+  /* Cards */
+  .section-title {
+    font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase;
+    color: #4a3f5c; margin: 28px 0 14px;
+  }
+  .card {
+    background: #12121e; border: 1px solid #1e1b2e; border-radius: 12px;
+    padding: 18px; margin-bottom: 10px;
+  }
+  .card .card-title {
+    font-size: 0.85rem; font-weight: 600; color: #d0c8e8; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card .card-title .tag {
+    font-size: 0.6rem; padding: 3px 8px; border-radius: 4px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .tag.workout { background: #1a1630; color: #a78bfa; }
+  .tag.meal { background: #1a2218; color: #6ee7b7; }
+  .tag.rest { background: #221a18; color: #f0a070; }
+
+  .card .item {
+    display: flex; justify-content: space-between; padding: 4px 0;
+    font-size: 0.8rem; color: #8b8b9e;
+  }
+  .card .item .val { color: #6b5e7a; font-size: 0.7rem; }
+
+  .card.meal-card .meal-type {
+    font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+    color: #4a3f5c; margin-top: 10px; margin-bottom: 4px;
+  }
+  .card.meal-card .meal-type:first-child { margin-top: 0; }
+
+  .summary {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: #12121e; border: 1px solid #1e1b2e; border-radius: 10px;
+    padding: 14px; text-align: center;
+  }
+  .stat .num { font-size: 1.4rem; font-weight: 700; color: #a78bfa; }
+  .stat .lbl { font-size: 0.6rem; letter-spacing: 2px; color: #4a3f5c; margin-top: 2px; }
+
+  .footer {
+    text-align: center; padding: 32px 16px;
+    color: #1e1b2e; font-size: 0.65rem; letter-spacing: 3px;
+  }
+
+  #content { min-height: 300px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="score">Score <span id="scoreVal">0</span></div>
-  <canvas id="c"></canvas>
-  <div class="controls">
-    <div class="ctrl up" data-dir="up">▲</div>
-    <div class="ctrl left" data-dir="left">◀</div>
-    <div class="ctrl right" data-dir="right">▶</div>
-    <div class="ctrl down" data-dir="down">▼</div>
-  </div>
-  <p class="hint">or use remote arrow keys</p>
-  <div class="gameover" id="go">
-    Game Over
-    <button id="restart">Play Again</button>
-  </div>
+
+<div class="hero">
+  <div class="brand">Premium Coaching</div>
+  <h1>Iron <span>Forge</span></h1>
+  <p>Training & Nutrition</p>
 </div>
 
+<div class="container">
+  <div class="summary">
+    <div class="stat"><div class="num">6</div><div class="lbl">Workouts/week</div></div>
+    <div class="stat"><div class="num">2,800</div><div class="lbl">Daily calories</div></div>
+    <div class="stat"><div class="num">180g</div><div class="lbl">Protein target</div></div>
+    <div class="stat"><div class="num">3L</div><div class="lbl">Water intake</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="both">Training + Meals</div>
+    <div class="tab" data-tab="training">Training</div>
+    <div class="tab" data-tab="meals">Meal Plan</div>
+  </div>
+
+  <div class="days" id="daySelector"></div>
+
+  <div id="content"></div>
+</div>
+
+<div class="footer">Iron Forge © 2026</div>
+
 <script>
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const scoreEl = document.getElementById('scoreVal');
-const goDiv = document.getElementById('go');
-
-// Size: fit nicely on screen
-const maxW = window.innerWidth - 24;
-const maxH = window.innerHeight - 280;
-const SIZE = Math.min(maxW, maxH, 500);
-const GRID = 20;
-const CELL = SIZE / GRID;
-canvas.width = SIZE; canvas.height = SIZE;
-
-let snake, food, dir, nextDir, score, speed, loop;
-
-function init() {
-  snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
-  dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
-  score = 0; speed = 100;
-  scoreEl.textContent = '0';
-  goDiv.style.display = 'none';
-  placeFood();
-  if (loop) clearInterval(loop);
-  loop = setInterval(tick, speed);
-}
-
-function placeFood() {
-  do {
-    food = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
-  } while (snake.some(s => s.x === food.x && s.y === food.y));
-}
-
-function tick() {
-  dir = nextDir;
-  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-
-  if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID ||
-      snake.some(s => s.x === head.x && s.y === head.y)) {
-    clearInterval(loop);
-    goDiv.style.display = 'block';
-    return;
+const DATA = {
+  mon: {
+    workout: [
+      { name: 'Barbell Squat', sets: '4×8', rest: '90s' },
+      { name: 'Romanian Deadlift', sets: '4×10', rest: '60s' },
+      { name: 'Leg Press', sets: '3×12', rest: '60s' },
+      { name: 'Walking Lunges', sets: '3×20', rest: '45s' },
+      { name: 'Calf Raises', sets: '4×15', rest: '45s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Oatmeal + whey + banana + almond butter', cal: '620' },
+      { type: 'Lunch', items: 'Grilled chicken breast + brown rice + broccoli', cal: '680' },
+      { type: 'Snack', items: 'Greek yogurt + granola + blueberries', cal: '380' },
+      { type: 'Dinner', items: 'Salmon fillet + sweet potato + asparagus', cal: '720' },
+      { type: 'Evening', items: 'Cottage cheese + walnuts + honey', cal: '400' },
+    ]
+  },
+  tue: {
+    workout: [
+      { name: 'Bench Press', sets: '4×8', rest: '90s' },
+      { name: 'Incline Dumbbell Press', sets: '3×10', rest: '60s' },
+      { name: 'Dips', sets: '3×12', rest: '60s' },
+      { name: 'Overhead Press', sets: '4×8', rest: '90s' },
+      { name: 'Lateral Raises', sets: '3×15', rest: '45s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Scrambled eggs ×3 + whole wheat toast + avocado', cal: '580' },
+      { type: 'Lunch', items: 'Tuna wrap + mixed greens + olive oil', cal: '650' },
+      { type: 'Snack', items: 'Protein shake + apple', cal: '350' },
+      { type: 'Dinner', items: 'Lean beef steak + quinoa + roasted vegetables', cal: '760' },
+      { type: 'Evening', items: 'Casein shake + almond milk', cal: '260' },
+    ]
+  },
+  wed: {
+    workout: [
+      { name: 'Deadlift', sets: '5×5', rest: '120s' },
+      { name: 'Pull-Ups', sets: '4×8', rest: '90s' },
+      { name: 'Barbell Row', sets: '4×10', rest: '60s' },
+      { name: 'Face Pulls', sets: '3×15', rest: '45s' },
+      { name: 'Barbell Curls', sets: '3×12', rest: '45s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Smoothie bowl — whey, spinach, mango, chia seeds', cal: '540' },
+      { type: 'Lunch', items: 'Ground turkey + whole wheat pasta + tomato sauce', cal: '710' },
+      { type: 'Snack', items: 'Rice cakes + peanut butter + banana', cal: '410' },
+      { type: 'Dinner', items: 'Cod fillet + mashed potatoes + green beans', cal: '660' },
+      { type: 'Evening', items: 'Hard-boiled eggs ×2 + carrot sticks', cal: '280' },
+    ]
+  },
+  thu: {
+    workout: [
+      { name: 'Front Squat', sets: '4×8', rest: '90s' },
+      { name: 'Bulgarian Split Squats', sets: '3×10', rest: '60s' },
+      { name: 'Leg Curls', sets: '3×12', rest: '60s' },
+      { name: 'Glute Bridges', sets: '4×12', rest: '60s' },
+      { name: 'Farmers Walk', sets: '3×40m', rest: '60s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Protein pancakes + maple syrup + strawberries', cal: '600' },
+      { type: 'Lunch', items: 'Chicken shawarma wrap + hummus + pickled vegetables', cal: '690' },
+      { type: 'Snack', items: 'Trail mix — almonds, walnuts, dried cranberries', cal: '370' },
+      { type: 'Dinner', items: 'Lamb chops + roasted potatoes + tzatziki', cal: '740' },
+      { type: 'Evening', items: 'Kefir + flax seeds', cal: '200' },
+    ]
+  },
+  fri: {
+    workout: [
+      { name: 'Weighted Dips', sets: '4×8', rest: '90s' },
+      { name: 'Close-Grip Bench', sets: '3×10', rest: '60s' },
+      { name: 'Skull Crushers', sets: '3×12', rest: '60s' },
+      { name: 'Hammer Curls', sets: '3×12', rest: '45s' },
+      { name: 'Preacher Curls', sets: '3×15', rest: '45s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Bagel + cream cheese + smoked salmon + capers', cal: '640' },
+      { type: 'Lunch', items: 'Chicken burrito bowl — rice, beans, corn, salsa, guac', cal: '750' },
+      { type: 'Snack', items: 'Cottage cheese + pineapple', cal: '310' },
+      { type: 'Dinner', items: 'Shrimp stir-fry + noodles + mixed vegetables', cal: '680' },
+      { type: 'Evening', items: 'Dark chocolate square + protein milk', cal: '220' },
+    ]
+  },
+  sat: {
+    workout: [
+      { name: 'Power Clean', sets: '5×3', rest: '120s' },
+      { name: 'Box Jumps', sets: '4×8', rest: '60s' },
+      { name: 'Sled Push', sets: '4×20m', rest: '90s' },
+      { name: 'Battle Ropes', sets: '3×30s', rest: '45s' },
+      { name: 'Plank + Side Plank', sets: '3×60s', rest: '30s' },
+    ],
+    meals: [
+      { type: 'Breakfast', items: 'Full English — eggs, bacon, sausage, beans, toast', cal: '780' },
+      { type: 'Lunch', items: 'Double cheeseburger (lean beef) + sweet potato fries', cal: '850' },
+      { type: 'Snack', items: 'Protein bar + banana', cal: '380' },
+      { type: 'Dinner', items: 'Grilled chicken thighs + couscous + roasted peppers', cal: '650' },
+      { type: 'Evening', items: 'Warm milk + honey + biscuit', cal: '240' },
+    ]
+  },
+  sun: {
+    workout: null,
+    meals: [
+      { type: 'Breakfast', items: 'Avocado toast ×2 + poached eggs + microgreens', cal: '560' },
+      { type: 'Lunch', items: 'Roast chicken + baked potatoes + peas + gravy', cal: '720' },
+      { type: 'Snack', items: 'Fruit salad — melon, berries, apple, mint', cal: '280' },
+      { type: 'Dinner', items: 'Baked trout + wild rice + lemon butter sauce', cal: '620' },
+      { type: 'Evening', items: 'Yogurt parfait — granola, honey, berries', cal: '340' },
+    ]
   }
+};
 
-  snake.unshift(head);
-  if (head.x === food.x && head.y === food.y) {
-    score += 10; scoreEl.textContent = score;
-    placeFood();
-    if (speed > 50) { clearInterval(loop); speed -= 2; loop = setInterval(tick, speed); }
-  } else {
-    snake.pop();
-  }
-  draw();
-}
+const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
+const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let currentTab = 'both';
+let currentDay = dayKeys[new Date().getDay() - 1] || 'mon';
 
-function draw() {
-  ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0, 0, SIZE, SIZE);
-  ctx.strokeStyle = '#111122'; ctx.lineWidth = 0.5;
-  for (let i = 0; i <= GRID; i++) {
-    ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, SIZE); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(SIZE, i * CELL); ctx.stroke();
-  }
-  ctx.fillStyle = '#f87171'; ctx.shadowColor = '#f87171'; ctx.shadowBlur = 8;
-  ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
-  ctx.shadowBlur = 0;
-  snake.forEach((s, i) => {
-    const alpha = 1 - (i / (snake.length + 10)) * 0.5;
-    ctx.fillStyle = i === 0 ? '#6ee7b7' : `rgba(110,231,183,${alpha})`;
-    ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
+// Day selector
+const daySel = document.getElementById('daySelector');
+dayKeys.forEach((k, i) => {
+  const b = document.createElement('div'); b.className = 'day-btn';
+  b.textContent = dayNames[i]; b.dataset.day = k;
+  b.addEventListener('click', () => { currentDay = k; render(); updateDayBtns(); });
+  daySel.appendChild(b);
+});
+
+function updateDayBtns() {
+  document.querySelectorAll('.day-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.day === currentDay);
   });
 }
 
-function changeDir(d) {
-  if (d === 'up' && dir.y !== 1) nextDir = { x: 0, y: -1 };
-  if (d === 'down' && dir.y !== -1) nextDir = { x: 0, y: 1 };
-  if (d === 'left' && dir.x !== 1) nextDir = { x: -1, y: 0 };
-  if (d === 'right' && dir.x !== -1) nextDir = { x: 1, y: 0 };
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active'); currentTab = t.dataset.tab; render();
+  });
+});
+
+function render() {
+  const data = DATA[currentDay];
+  const showTraining = currentTab === 'both' || currentTab === 'training';
+  const showMeals = currentTab === 'both' || currentTab === 'meals';
+  let html = '';
+
+  if (showTraining && data.workout) {
+    html += '<div class="section-title">Workout — ' + dayNames[dayKeys.indexOf(currentDay)] + '</div>';
+    html += '<div class="card">';
+    html += '<div class="card-title">Legs & Core<span class="tag workout">' + (currentDay === 'sat' ? 'Conditioning' : currentDay === 'sun' ? 'Rest' : 'Strength') + '</span></div>';
+    data.workout.forEach(w => {
+      html += `<div class="item"><span>${w.name}</span><span class="val">${w.sets} · ${w.rest}</span></div>`;
+    });
+    html += '</div>';
+  } else if (showTraining && !data.workout) {
+    html += '<div class="section-title">Sunday</div>';
+    html += '<div class="card"><div class="card-title">Rest Day<span class="tag rest">Recovery</span></div>';
+    html += '<div class="item"><span>Active recovery — light walk, stretching, foam rolling</span></div>';
+    html += '</div>';
+  }
+
+  if (showMeals && data.meals) {
+    html += '<div class="section-title">Meal Plan — ' + dayNames[dayKeys.indexOf(currentDay)] + '</div>';
+    html += '<div class="card meal-card">';
+    let totalCal = 0;
+    data.meals.forEach(m => {
+      totalCal += parseInt(m.cal);
+      html += `<div class="meal-type">${m.type}</div>`;
+      html += `<div class="item"><span>${m.items}</span><span class="val">${m.cal} cal</span></div>`;
+    });
+    html += `<div class="meal-type" style="color:#a78bfa;margin-top:8px;">Total: ~${totalCal} cal · 180g protein</div>`;
+    html += '</div>';
+  }
+
+  document.getElementById('content').innerHTML = html || '<p style="color:#4a3f5c;text-align:center;margin-top:40px;">Select a tab.</p>';
 }
 
-document.addEventListener('keydown', e => {
-  const map = { ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right' };
-  const d = map[e.key]; if (d) changeDir(d);
-});
-
-document.querySelectorAll('.ctrl').forEach(btn => {
-  btn.addEventListener('click', () => changeDir(btn.dataset.dir));
-});
-
-// Swipe for phones
-let tx, ty;
-canvas.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; });
-canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-canvas.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - tx;
-  const dy = e.changedTouches[0].clientY - ty;
-  if (Math.abs(dx) > Math.abs(dy)) {
-    changeDir(dx > 30 ? 'right' : dx < -30 ? 'left' : null);
-  } else {
-    changeDir(dy > 30 ? 'down' : dy < -30 ? 'up' : null);
-  }
-});
-
-document.getElementById('restart').addEventListener('click', init);
-
-init();
-draw();
+updateDayBtns();
+render();
 </script>
 </body>
 </html>
